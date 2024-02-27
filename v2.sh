@@ -3,12 +3,11 @@
 # Agrega el alias al archivo .bashrc
 echo "alias v2='/root/v2.sh'" >> ~/.bashrc
 
-# Recarga el archivo .bashrc para que el alias sea efectivo
+
 source ~/.bashrc
 
-# Ruta al archivo de configuración de V2Ray
+
 CONFIG_FILE="/etc/v2ray/config.json"
-# Ruta al archivo de registro de usuarios
 USERS_FILE="/etc/v2ray/v2clientes.txt"
 
 # Colores
@@ -16,7 +15,7 @@ RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 CYAN=$(tput setaf 6)
-NC=$(tput sgr0) # No Color
+NC=$(tput sgr0) 
 
 
 install_dependencies() {
@@ -160,16 +159,16 @@ delete_user() {
         return
     fi
 
-    # Eliminar el usuario del archivo de configuración
+    
     jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(select(.id != \"$userId\")))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
 
-    # Eliminar el usuario del archivo de registro
+    
     if [ -n "$userId" ]; then
         sed -i "/$userId/d" "$USERS_FILE"
         print_message "${RED}" "Usuario con ID $userId eliminado."
     fi
 
-    # Reiniciar el servicio V2Ray para aplicar los cambios
+    
     systemctl restart v2ray
 }
 
@@ -198,9 +197,9 @@ show_registered_users() {
 
     while IFS='|' read -r uuid nombre dias fecha_expiracion || [[ -n "$uuid" ]]; do
         if [ "$dias" -ge 0 ]; then
-            color="${GREEN}"  # Usuario activo (sin expirar)
+            color="${GREEN}"  
         else
-            color="${RED}"    # Usuario expirado
+            color="${RED}"    
         fi
         printf "%s %-37s %-36s %-6s %-10s${NC}\n" "$color" "$uuid" "$nombre" "$dias" "$fecha_expiracion"
     done < <(sort -t'|' -k3,3nr $USERS_FILE)
@@ -211,12 +210,12 @@ show_registered_users() {
 cambiar_path() {
     read -p "Introduce el nuevo path: " nuevo_path
 
-    # Utiliza jq para actualizar el path en el archivo de configuración de V2Ray
+    
     jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
 
     echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
 
-    # Reiniciar el servicio V2Ray para aplicar los cambios
+    
     systemctl restart v2ray
 }
 
@@ -237,11 +236,11 @@ show_vmess_by_uuid() {
         return
     fi
 
-    # Obtener información detallada del usuario
+    
     user_name=$(echo $user_info | awk '{print $2}')
     expiration_date=$(date -d "@$(echo $user_info | awk '{print $4}')" +"%d-%m-%y")
 
-    # Mostrar información de vmess
+    
     print_message "${CYAN}" "Información de vmess del usuario con UUID $userUuid:"
     echo "=========================="
     echo "Group: A"
@@ -256,18 +255,18 @@ show_vmess_by_uuid() {
     echo "=========================="
 }
 
-# Función para entrar al V2Ray nativo
+
 entrar_v2ray_original() {
-    # Iniciar el servicio V2Ray
+    
     systemctl start v2ray
 
-    # Acceder a la interfaz de usuario de V2Ray
+    
     v2ray
 
     print_message "${CYAN}" "Has entrado al menú nativo de V2Ray."
 }
 
-# Bucle principal del programa
+
 while true; do
     show_menu
     read -p "Seleccione una opción: " opcion
@@ -309,7 +308,7 @@ while true; do
                         ;;
                     2)
                         echo "Desinstalando V2Ray..."
-                        # Coloca aquí los comandos para desinstalar V2Ray si es necesario
+                        
                         systemctl stop v2ray
                         systemctl disable v2ray
                         rm -rf /usr/bin/v2ray /etc/v2ray
@@ -317,7 +316,7 @@ while true; do
                         ;;
                     3)
                         echo "Volviendo al menú principal..."
-                        break  # Sale del bucle interno y vuelve al bucle principal
+                        break  
                         ;;
                     *)
                         echo "Opción no válida. Por favor, intenta de nuevo."
@@ -327,7 +326,7 @@ while true; do
             ;;
         9)
             echo "Saliendo..."
-            exit 0  # Sale del script completamente
+            exit 0  
             ;;
         *)
             echo "Opción no válida. Por favor, intenta de nuevo."
