@@ -181,12 +181,34 @@ create_backup() {
 }
 
  
+
 restore_backup() {
     read -p "Ingrese el nombre del archivo de respaldo: " backupFileName
-    cp "$backupFileName"_config.json $CONFIG_FILE
-    cp "$backupFileName"_v2clientes.txt $USERS_FILE
-    print_message "${GREEN}" "Copia de seguridad restaurada."
+
+    # Verificar si el archivo de respaldo existe
+    if [ ! -e "${backupFileName}_config.json" ] || [ ! -e "${backupFileName}_v2clientes.txt" ]; then
+        print_message "${RED}" "Error: El archivo de respaldo no existe."
+        return 1
+    fi
+
+    # Realizar la copia de seguridad
+    cp "${backupFileName}_config.json" "$CONFIG_FILE"
+    cp "${backupFileName}_v2clientes.txt" "$USERS_FILE"
+
+    # Verificar si las copias de seguridad fueron exitosas
+    if [ $? -eq 0 ]; then
+        print_message "${GREEN}" "Copia de seguridad restaurada correctamente."
+        
+        # Reiniciar el servicio V2Ray
+        systemctl restart v2ray  # Asumiendo que utilizas systemd para gestionar servicios
+        # Puedes ajustar este comando según el sistema de gestión de servicios que estés utilizando
+
+        print_message "${GREEN}" "Servicio V2Ray reiniciado."
+    else
+        print_message "${RED}" "Error al restaurar la copia de seguridad."
+    fi
 }
+
 
 
 show_registered_users() {
