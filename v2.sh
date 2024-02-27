@@ -16,7 +16,7 @@ GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 CYAN=$(tput setaf 6)
 NC=$(tput sgr0) 
-
+VERSION="1.1"
 
 install_dependencies() {
     echo "Instalando dependencias..."
@@ -62,10 +62,12 @@ check_v2ray_status() {
 
 show_menu() {
     local status_line
+    local VERSION="1.1"
+
     status_line=$(check_v2ray_status)
 
     echo -e "${CYAN}╔════════════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}          • V2Ray MENU •          ${NC}"
+    echo -e "${YELLOW}          • V2Ray MENU •       version $VERSION     ${NC}"
     echo -e "[${status_line}]"
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
     echo -e "1. ${GREEN}➕ Agregar nuevo usuario${NC}"
@@ -101,51 +103,90 @@ show_backup_menu() {
     esac
 }
 
-
 add_user() {
     read -p "Ingrese el nombre del nuevo usuario: " userName
     read -p "Ingrese la duración en días para el nuevo usuario: " days
 
-    userId=$(uuidgen)  
+    
+    if ! [[ "$days" =~ ^[0-9]+$ ]]; then
+        echo -e "\033[31mLa duración debe ser un número.\033[0m"
+        return 1
+    fi
+
+    
+    echo -e "\033[36mFormato aceptado para el UUID personalizado: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX\033[0m"
+    
+    read -p "¿Desea ingresar un UUID personalizado? (Sí: S, No: cualquier tecla): " customUUIDOption
+
+    if [ "$customUUIDOption" == "S" ] || [ "$customUUIDOption" == "s" ]; then
+        read -p "Ingrese el UUID personalizado: " customUUID
+
+        
+        if [[ ! $customUUID =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+            echo -e "\033[31mEl UUID personalizado no tiene el formato correcto.\033[0m"
+            return 1
+        else
+            userId=$customUUID
+        fi
+    else
+        userId=$(uuidgen)  
+    fi
+
     alterId=0  
     expiration_date=$(date -d "+$days days" +%s)  
 
     
-    print_message "${CYAN}" "UUID del nuevo usuario: ${GREEN}$userId${NC}"
-    print_message "${YELLOW}" "Fecha de expiración: ${GREEN}$(date -d "@$expiration_date" +"%d-%m-%y")${NC}"
+    echo -e "\033[36mUUID del nuevo usuario: \033[32m$userId\033[0m"
+    echo -e "\033[33mFecha de expiración: \033[32m$(date -d "@$expiration_date" +"%d-%m-%y")\033[0m"
+
+    
+    if grep -q "$userId" "$USERS_FILE"; then
+        echo -e "\033[31mYa existe un usuario con el mismo UUID. Eliminando el usuario existente...\033[0m"
+        delete_user_by_uuid "$userId"
+    fi
 
     
     userJson="{\"alterId\": $alterId, \"id\": \"$userId\", \"email\": \"$userName\", \"expiration\": $expiration_date}"
 
     
-    jq ".inbounds[0].settings.clients += [$userJson]" $CONFIG_FILE > $CONFIG_FILE.tmp && mv $CONFIG_FILE.tmp $CONFIG_FILE
+    jq ".inbounds[0].settings.clients += [$userJson]" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
 
     
-    echo "$userId | $userName | $days | $(date -d "@$expiration_date" +"%d-%m-%y")" >> $USERS_FILE
+    echo "$userId | $userName | $days | $(date -d "@$expiration_date" +"%d-%m-%y")" >> "$USERS_FILE"
 
     
     systemctl restart v2ray
-    print_message "${GREEN}" "Usuario agregado exitosamente."
+    echo -e "\033[32mUsuario agregado exitosamente.\033[0m"
 }
 
 
-install_or_uninstall_v2ray() {
-    echo "Seleccione una opción para V2Ray:"
-    echo "I. Instalar V2Ray"
-    echo "D. Desinstalar V2Ray"
-    read -r install_option
+delete_user_by_uuid() {
+    local userId=$1
 
-    case $install_option in
-        [Ii])
-            install_v2ray
-            ;;
-        [Dd])
-            uninstall_v2ray
-            ;;
-        *)
-            print_message "${RED}" "Opción no válida."
-            ;;
-    esac
+    
+    jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(select(.id != \"$userId\")))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+
+    
+    sed -i "/$userId/d" "$USERS_FILE"
+
+    
+    systemctl restart v2ray
+    echo -e "\033[33mUsuario con UUID $userId eliminado.\033[0m"
+}
+
+
+delete_users_by_uuid() {
+    local userId=$1
+
+    
+    jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(select(.id != \"$userId\")))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+
+    
+    sed -i "/$userId/d" "$USERS_FILE"
+
+    
+    systemctl restart v2ray
+    echo -e "\033[33mUsuarios con UUID $userId eliminados.\033[0m"
 }
 
 
@@ -170,9 +211,7 @@ delete_user() {
 
     
     systemctl restart v2ray
-}
-
- 
+} 
 create_backup() {
     read -p "Ingrese el nombre del archivo de respaldo: " backupFileName
     cp $CONFIG_FILE "$backupFileName"_config.json
@@ -185,30 +224,29 @@ create_backup() {
 restore_backup() {
     read -p "Ingrese el nombre del archivo de respaldo: " backupFileName
 
-    # Verificar si el archivo de respaldo existe
+    
     if [ ! -e "${backupFileName}_config.json" ] || [ ! -e "${backupFileName}_v2clientes.txt" ]; then
         print_message "${RED}" "Error: El archivo de respaldo no existe."
         return 1
     fi
 
-    # Realizar la copia de seguridad
+    
     cp "${backupFileName}_config.json" "$CONFIG_FILE"
     cp "${backupFileName}_v2clientes.txt" "$USERS_FILE"
 
-    # Verificar si las copias de seguridad fueron exitosas
+    
     if [ $? -eq 0 ]; then
         print_message "${GREEN}" "Copia de seguridad restaurada correctamente."
         
-        # Reiniciar el servicio V2Ray
-        systemctl restart v2ray  # Asumiendo que utilizas systemd para gestionar servicios
-        # Puedes ajustar este comando según el sistema de gestión de servicios que estés utilizando
+        
+        systemctl restart v2ray  
+        
 
         print_message "${GREEN}" "Servicio V2Ray reiniciado."
     else
         print_message "${RED}" "Error al restaurar la copia de seguridad."
     fi
 }
-
 
 
 show_registered_users() {
@@ -242,6 +280,7 @@ cambiar_path() {
 }
 
 
+
 show_vmess_by_uuid() {
     show_registered_users
     read -p "Ingrese el UUID del usuario para ver la información de vmess (presiona Enter para volver al menú principal): " userUuid
@@ -259,8 +298,8 @@ show_vmess_by_uuid() {
     fi
 
     
-    user_name=$(echo $user_info | awk '{print $2}')
-    expiration_date=$(date -d "@$(echo $user_info | awk '{print $4}')" +"%d-%m-%y")
+    user_name=$(echo $user_info | awk -F "|" '{print $2}' | tr -d '[:space:]')
+    expiration_date=$(echo $user_info | awk '{print $6" "$7}')
 
     
     print_message "${CYAN}" "Información de vmess del usuario con UUID $userUuid:"
@@ -274,9 +313,9 @@ show_vmess_by_uuid() {
     echo "Alter ID: 0"
     echo "Network: WebSocket host: ssh-fastly.panda1.store, path: privadoAR"
     echo "TcpFastOpen: open"
+    echo "Fecha de Expiración: $expiration_date"
     echo "=========================="
 }
-
 
 entrar_v2ray_original() {
     
@@ -290,6 +329,7 @@ entrar_v2ray_original() {
 
 
 while true; do
+
     show_menu
     read -p "Seleccione una opción: " opcion
 
@@ -351,8 +391,7 @@ while true; do
             exit 0  
             ;;
         *)
-            echo "Opción no válida. Por favor, intenta de nuevo."
+            echo -e "\033[31mOpción no válida. Por favor, intenta de nuevo.\033[0m"
             ;;
     esac
 done
-
