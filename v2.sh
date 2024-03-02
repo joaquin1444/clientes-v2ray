@@ -63,7 +63,7 @@ check_v2ray_status() {
 
 
 show_menu() {
-    local VERSION="1.3"
+    local VERSION="1.4"
     local status_line
     status_line=$(check_v2ray_status)
 
@@ -73,16 +73,18 @@ show_menu() {
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
     echo -e "1. ${GREEN}➕ Agregar nuevo usuario${NC}"
     echo -e "2. ${RED}🗑 Eliminar usuario${NC}"
-    echo -e "3. ${YELLOW}👥 Ver información de usuarios${NC}"
-    echo -e "4. ${YELLOW}ℹ️ Ver información de vmess${NC}"
-    echo -e "5. ${YELLOW}📂 Gestión de copias de seguridad${NC}"
-    echo -e "6. ${YELLOW}🔄 Cambiar el path de V2Ray${NC}"
-    echo -e "7. ${YELLOW}🚀 Entrar al V2Ray nativo${NC}"
-    echo -e "8. ${YELLOW}🔧 Instalar/Desinstalar V2Ray${NC}"
-    echo -e "9. ${YELLOW}🚪 Salir${NC}"
+    echo -e "3. ${YELLOW}🔄 Editar UUID de usuario${NC}"
+    echo -e "4. ${YELLOW}👥 Ver información de usuarios${NC}"
+    echo -e "5. ${YELLOW}ℹ️ Ver información de vmess${NC}"
+    echo -e "6. ${YELLOW}📂 Gestión de copias de seguridad${NC}"
+    echo -e "7. ${YELLOW}🔄 Cambiar el path de V2Ray${NC}"
+    echo -e "8. ${YELLOW}🚀 Entrar al V2Ray nativo${NC}"
+    echo -e "9. ${YELLOW}🔧 Instalar/Desinstalar V2Ray${NC}"
+    echo -e "10. ${YELLOW}🚪 Salir${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
-    echo -e "${BLUE}⚙️ Acceder al menú con V2${NC}"  
+    echo -e "${BLUE}⚙️ Acceder al menú con V2${NC}"
 }
+
 
 show_backup_menu() {
     echo -e "${YELLOW}Opciones de v2ray backup:${NC}"
@@ -214,6 +216,35 @@ delete_user_by_uuid() {
     
     systemctl restart v2ray
     echo -e "\033[33mUsuario con UUID $userId eliminado.\033[0m"
+}
+
+edit_user_uuid() {
+    show_registered_users
+    read -p "Ingrese el ID del usuario que desea editar (o presione Enter para cancelar): " userId
+
+    if [ -z "$userId" ]; then
+        print_message "${YELLOW}" "No se seleccionó ningún ID. Volviendo al menú principal."
+        return
+    fi
+
+    read -p "Ingrese el nuevo UUID para el usuario con ID $userId: " newUuid
+
+    if ! [[ "$newUuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+        print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+        return
+    fi
+
+    if grep -q "$newUuid" "$USERS_FILE"; then
+        print_message "${RED}" "Advertencia: Ya existe un usuario con el mismo UUID. No se puede asignar el mismo UUID a múltiples usuarios."
+        return
+    fi
+
+    jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(if .id == \"$userId\" then .id = \"$newUuid\" else . end))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+
+    sed -i "s/$userId/$newUuid/" "$USERS_FILE"
+
+    systemctl restart v2ray
+    print_message "${GREEN}" "UUID del usuario con ID $userId editado exitosamente."
 }
 
 create_backup() {
@@ -426,6 +457,7 @@ cambiar_formatos_y_eliminar_dias() {
 cambiar_formatos_y_eliminar_dias
 
 
+
 while true; do
     show_menu
     read -p "Seleccione una opción: " opcion
@@ -438,52 +470,55 @@ while true; do
             delete_user
             ;;
         3)
-            show_registered_users
+            edit_user_uuid
             ;;
         4)
-            show_vmess_by_uuid
+            show_registered_users
             ;;
         5)
-            show_backup_menu
+            show_vmess_by_uuid
             ;;
         6)
-            cambiar_path
+            show_backup_menu
             ;;
         7)
             entrar_v2ray_original
             ;;
         8)
-            while true; do
-                echo "Seleccione una opción para V2Ray:"
-                echo "1. Instalar V2Ray"
-                echo "2. Desinstalar V2Ray"
-                echo "3. Volver al menú principal"
-                read -r install_option
-
-                case $install_option in
-                    1)
-                        echo "Instalando V2Ray..."
-                        bash -c "$(curl -fsSL https://megah.shop/v2ray)"
-                        ;;
-                    2)
-                        echo "Desinstalando V2Ray..."
-                        
-                        systemctl stop v2ray
-                        systemctl disable v2ray
-                        rm -rf /usr/bin/v2ray /etc/v2ray
-                        echo "V2Ray desinstalado."
-                        ;;
-                    3)
-                        echo "Volviendo al menú principal..."
-                        break  
-                        ;;
-                    *)
-                        echo "Opción no válida. Por favor, intenta de nuevo."
-                        ;;
-                esac
-            done
+            cambiar_path
             ;;
         9)
+            while true; do
+    echo -e "${CYAN}Seleccione una opción para V2Ray:${NC}"
+    echo -e "1. ${GREEN}Instalar V2Ray${NC}"
+    echo -e "2. ${RED}Desinstalar V2Ray${NC}"
+    echo -e "3. ${YELLOW}Volver al menú principal${NC}"
+    read -r install_option
+
+    case $install_option in
+        1)
+            echo -e "${YELLOW}Instalando V2Ray...${NC}"
+            bash -c "$(curl -fsSL https://megah.shop/v2ray)"
+            ;;
+        2)
+            echo -e "${RED}Desinstalando V2Ray...${NC}"
+            systemctl stop v2ray
+            systemctl disable v2ray
+            rm -rf /usr/bin/v2ray /etc/v2ray
+            echo -e "${GREEN}V2Ray desinstalado.${NC}"
+            ;;
+        3)
+            echo -e "${YELLOW}Volviendo al menú principal...${NC}"
+            break  
+            ;;
+        *)
+            echo -e "${RED}Opción no válida. Por favor, intenta de nuevo.${NC}"
+            ;;
+    esac
+done
+
+            ;;
+        10)
             echo "Saliendo..."
             exit 0  
             ;;
