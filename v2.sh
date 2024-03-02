@@ -38,6 +38,7 @@ install_v2ray() {
 
 uninstall_v2ray() {
     echo "Desinstalando V2Ray..."
+    
     systemctl stop v2ray
     systemctl disable v2ray
     rm -rf /usr/bin/v2ray /etc/v2ray
@@ -62,7 +63,7 @@ check_v2ray_status() {
 
 
 show_menu() {
-    local VERSION="1.2"
+    local VERSION="1.3"
     local status_line
     status_line=$(check_v2ray_status)
 
@@ -80,7 +81,7 @@ show_menu() {
     echo -e "8. ${YELLOW}🔧 Instalar/Desinstalar V2Ray${NC}"
     echo -e "9. ${YELLOW}🚪 Salir${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
-    echo -e "${BLUE}⚙️ Acceder al menú con V2${NC}"  # Mensaje adicional
+    echo -e "${BLUE}⚙️ Acceder al menú con V2${NC}"  
 }
 
 show_backup_menu() {
@@ -103,61 +104,67 @@ show_backup_menu() {
     esac
 }
 
+
 add_user() {
-    read -p "Ingrese el nombre del nuevo usuario: " userName
-    read -p "Ingrese la duración en días para el nuevo usuario: " days
+    print_message "${CYAN}" "Agregar Nuevo Usuario"
+
+    read -p "$(echo -e "${YELLOW}Ingrese el nombre del nuevo usuario:${NC} ")" userName
 
     
-    if ! [[ "$days" =~ ^[0-9]+$ ]]; then
-        echo -e "\033[31mLa duración debe ser un número.\033[0m"
+    if grep -q "| $userName |" "$USERS_FILE"; then
+        print_message "${RED}" "Ya existe un usuario con el mismo nombre. Por favor, elija otro nombre."
         return 1
     fi
 
-    
-    echo -e "\033[36mFormato aceptado para el UUID personalizado: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX\033[0m"
-    
-    read -p "¿Desea ingresar un UUID personalizado? (Sí: S, No: cualquier tecla): " customUUIDOption
+    read -p "$(echo -e "${YELLOW}Ingrese la duración en días para el nuevo usuario:${NC} ")" days
 
-    if [ "$customUUIDOption" == "S" ] || [ "$customUUIDOption" == "s" ]; then
-        read -p "Ingrese el UUID personalizado: " customUUID
+    if ! [[ "$days" =~ ^[0-9]+$ ]]; then
+        print_message "${RED}" "La duración debe ser un número."
+        return 1
+    fi
+
+    read -p "$(echo -e "${YELLOW}¿Desea ingresar un UUID personalizado? (Sí: S, No: cualquier tecla):${NC} ")" customUuidChoice
+
+    if [[ "${customUuidChoice,,}" == "s" ]]; then
+        read -p "$(echo -e "${YELLOW}Ingrese el UUID personalizado para el nuevo usuario (Formato: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX):${NC} ")" userId
 
         
-        if [[ ! $customUUID =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
-            echo -e "\033[31mEl UUID personalizado no tiene el formato correcto.\033[0m"
+        if ! [[ "$userId" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+            print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
             return 1
-        else
-            userId=$customUUID
+        fi
+
+        
+        if grep -q "$userId" "$USERS_FILE"; then
+            print_message "${RED}" "Advertencia: Ya existe un usuario con el mismo UUID. Eliminando el usuario existente..."
+            delete_user_by_uuid "$userId"
         fi
     else
-        userId=$(uuidgen)  
-    fi
-
-    alterId=0  
-    expiration_date=$(date -d "+$days days" +%s)  
-
-    
-    echo -e "\033[36mUUID del nuevo usuario: \033[32m$userId\033[0m"
-    echo -e "\033[33mFecha de expiración: \033[32m$(date -d "@$expiration_date" +"%d-%m-%y")\033[0m"
-
-    
-    if grep -q "$userId" "$USERS_FILE"; then
-        echo -e "\033[31mYa existe un usuario con el mismo UUID. Eliminando el usuario existente...\033[0m"
-        delete_user_by_uuid "$userId"
+        
+        userId=$(uuidgen)
     fi
 
     
-    userJson="{\"alterId\": $alterId, \"id\": \"$userId\", \"email\": \"$userName\", \"expiration\": $expiration_date}"
+    alterId=0
+    expiration_date=$(date -d "+$days days" +%Y-%m-%d)
 
-    
+    print_message "${CYAN}" "UUID del nuevo usuario: ${GREEN}$userId${NC}"
+    print_message "${YELLOW}" "Fecha de expiración: ${GREEN}$expiration_date${NC}"
+
+    userJson="{\"alterId\": $alterId, \"id\": \"$userId\", \"email\": \"$userName\", \"expiration\": $(date -d "$expiration_date" +%s)}"
+
     jq ".inbounds[0].settings.clients += [$userJson]" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
 
-    
-    echo "$userId | $userName | $days | $(date -d "@$expiration_date" +"%d-%m-%y")" >> "$USERS_FILE"
+    # Almacenar en v2clientes.txt con el formato deseado
+    echo "$userId | $userName | $expiration_date" >> "$USERS_FILE"
 
-    
     systemctl restart v2ray
-    echo -e "\033[32mUsuario agregado exitosamente.\033[0m"
+    print_message "${GREEN}" "Usuario agregado exitosamente."
 }
+
+
+
+
 
 delete_user() {
     print_message "${CYAN}" "⚠️ Advertencia: los expirados Se recomienda eliminarlo manualmente con el ID⚠️ "
@@ -181,6 +188,7 @@ delete_user() {
     
     systemctl restart v2ray
 }
+
 delete_users_by_uuid() {
     local userId=$1
 
@@ -208,30 +216,9 @@ delete_user_by_uuid() {
     echo -e "\033[33mUsuario con UUID $userId eliminado.\033[0m"
 }
 
-
-install_or_uninstall_v2ray() {
-    echo "Seleccione una opción para V2Ray:"
-    echo "I. Instalar V2Ray"
-    echo "D. Desinstalar V2Ray"
-    read -r install_option
-
-    case $install_option in
-        [Ii])
-            install_v2ray
-            ;;
-        [Dd])
-            uninstall_v2ray
-            ;;
-        *)
-            print_message "${RED}" "Opción no válida."
-            ;;
-    esac
-}
-
-
 create_backup() {
     read -p "Ingrese el nombre del archivo de respaldo: " backupFileName
-    backupFilePath="/root/$backupFileName"  # Ruta de guardado
+    backupFilePath="/root/$backupFileName"  
     cp $CONFIG_FILE "$backupFilePath"_config.json
     cp $USERS_FILE "$backupFilePath"_v2clientes.txt
     print_message "${GREEN}" "Copia de seguridad creada en: $backupFilePath"
@@ -254,6 +241,92 @@ show_backups() {
     done
 }
 
+show_vmess_by_uuid() {
+    show_registered_users
+    read -p "Ingrese el UUID del usuario para ver la información de vmess (presiona Enter para volver al menú principal): " userUuid
+
+    if [ -z "$userUuid" ]; then
+        print_message "${YELLOW}" "Volviendo al menú principal."
+        return
+    fi
+
+    user_info=$(grep "$userUuid" $USERS_FILE)
+
+    if [ -z "$user_info" ]; then
+        print_message "${RED}" "UUID no encontrado. Volviendo al menú principal."
+        return
+    fi
+
+    
+    user_name=$(echo $user_info | awk -F'|' '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')  # Eliminar espacios en blanco al inicio y al final
+    expiration_date=$(echo $user_info | awk -F'|' '{print $4}' | sed 's/^[ \t]*//;s/[ \t]*$//' | date +"%Y-%m-%d" -f -)  # Formatear la fecha a yyyy-mm-dd
+
+    
+    print_message "${CYAN}" "Información de vmess del usuario con UUID $userUuid:"
+    echo "=========================="
+    echo "Group: A"
+    echo "IP: 186.148.224.202"
+    echo "Port: 80"
+    echo "TLS: close"
+    echo "Email: $user_name"
+    echo "UUID: $userUuid"
+    echo "Alter ID: 0"
+    echo "Network: WebSocket host: ssh-fastly.panda1.store, path: privadoAR"
+    echo "TcpFastOpen: open"
+    echo "Fecha de Expiración: $expiration_date"
+    echo "=========================="
+}
+
+show_registered_users() {
+    print_message "${CYAN}" "Información de Usuarios:"
+    echo "=============================================================================================="
+    echo "UUID                                 Nombre             Fecha de Expiración   Días Restantes"
+    echo "=============================================================================================="
+
+    current_time=$(date +%s)
+
+    while IFS='|' read -r uuid nombre fecha_expiracion || [[ -n "$uuid" ]]; do
+        
+        uuid=$(echo "$uuid" | tr -d '[:space:]')
+        nombre=$(echo "$nombre" | tr -d '[:space:]')
+        fecha_expiracion=$(echo "$fecha_expiracion" | tr -d '[:space:]')
+
+        expiracion_timestamp=$(date -d "$fecha_expiracion" +%s)
+        dias_restantes=$(( (expiracion_timestamp - current_time + 86399) / 86400 ))
+
+        
+        if [ "$current_time" -ge "$expiracion_timestamp" ]; then
+            color="${RED}"
+        else
+            color="${GREEN}"
+        fi
+
+        
+        fecha_expiracion_formateada=$(date -d "$fecha_expiracion" +"%Y-%m-%d")
+        printf "%s %-37s %-20s %-20s %-20s\n" "$color" "$uuid" "$nombre" "$fecha_expiracion_formateada" "$dias_restantes"
+    done < <(sort -t'|' -k3,3nr "/etc/v2ray/v2clientes.txt")
+
+    echo "=============================================================================================="
+}
+
+
+
+
+cambiar_path() {
+    read -p "Introduce el nuevo path: " nuevo_path
+
+    
+    jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+
+    echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
+
+    
+    systemctl restart v2ray
+}
+
+
+
+
 
 restore_backup() {
     show_backups
@@ -269,60 +342,7 @@ restore_backup() {
     fi
 }
 
-show_registered_users() {
-    print_message "${CYAN}" "Información de Usuarios:"
-    echo "================================================================================================="
-    echo "UUID                                 Nombre                                Días   Días Restantes   Fecha de Expiración"
-    echo "================================================================================================="
 
-    current_time=$(date +%s)  
-    last_update=$current_time  
-
-    while IFS='|' read -r uuid nombre dias fecha_expiracion || [[ -n "$uuid" ]]; do
-        
-        expiracion_timestamp=$(date -d "$(echo "$fecha_expiracion" | sed -E 's/([0-9]{2})-([0-9]{2})-([0-9]{2})/\3-\2-\1/')" +%s)
-
-        
-        if [ "$((current_time - last_update))" -ge 86400 ]; then
-            dias=$((dias - 1))
-            last_update=$current_time
-            
-            sed -i "s/$uuid|$nombre|$dias|$fecha_expiracion/$uuid|$nombre|$dias|$(date -d @$expiracion_timestamp +'%d-%m-%y')/" "/etc/v2ray/v2clientes.txt"
-        fi
-
-        
-        dias_restantes=$(( (expiracion_timestamp - current_time + 86399) / 86400 ))
-
-        
-        if [ "$current_time" -ge "$expiracion_timestamp" ] && [ "$dias" -ge 0 ]; then
-            
-            color="${RED}"
-        elif [ "$dias" -ge 0 ] || [ "$current_time" -lt "$expiracion_timestamp" ]; then
-            
-            color="${GREEN}"
-        else
-            
-            color="${RED}"
-        fi
-
-        
-        printf "%s %-37s %-36s %-6s %-16s %-10s${NC}\n" "$color" "$uuid" "$nombre" "$dias" "$dias_restantes" "$(date -d @$expiracion_timestamp +'%d-%m-%y')"
-    done < <(sort -t'|' -k3,3nr "/etc/v2ray/v2clientes.txt")
-    echo "================================================================================================="
-}
-
-
-cambiar_path() {
-    read -p "Introduce el nuevo path: " nuevo_path
-
-    
-    jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
-
-    echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
-
-    
-    systemctl restart v2ray
-}
 
 
 show_vmess_by_uuid() {
@@ -362,6 +382,7 @@ show_vmess_by_uuid() {
 }
 
 
+
 entrar_v2ray_original() {
     
     systemctl start v2ray
@@ -371,6 +392,35 @@ entrar_v2ray_original() {
 
     print_message "${CYAN}" "Has entrado al menú nativo de V2Ray."
 }
+
+#!/bin/bash
+
+
+archivo="/etc/v2ray/v2clientes.txt"
+
+
+cp "$archivo" "$archivo.bak"
+
+
+cambiar_formatos_y_eliminar_dias() {
+    while IFS=' | ' read -r id nombre dias fecha; do
+        
+        if [[ $fecha =~ ^[0-9]{2}-[0-9]{2}-[0-9]{2}$ ]]; then
+            
+            dia=${fecha:0:2}
+            mes=${fecha:3:2}
+            ano="20${fecha:6:2}"
+            fecha_nueva="$ano-$mes-$dia"
+            
+            
+            sed -i "s/$id | $nombre | $dias | $fecha/$id | $nombre | $fecha_nueva/" "$archivo"
+        fi
+    done < "$archivo"
+}
+
+
+
+cambiar_formatos_y_eliminar_dias
 
 
 while true; do
@@ -439,4 +489,3 @@ while true; do
             ;;
     esac
 done
-
