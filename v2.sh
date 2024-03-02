@@ -332,15 +332,18 @@ restore_backup() {
     show_backups
     read -p "Ingrese el nombre del archivo de respaldo a restaurar: " backupFileName
     
-    
     if [[ -f "/root/${backupFileName}_config.json" ]]; then
         cp "/root/${backupFileName}_config.json" $CONFIG_FILE
         cp "/root/${backupFileName}_v2clientes.txt" $USERS_FILE
         print_message "${GREEN}" "Copia de seguridad '$backupFileName' restaurada."
+
+        # Restart V2Ray
+        systemctl restart v2ray
     else
         print_message "${RED}" "Error: El archivo de respaldo '$backupFileName' no existe."
     fi
 }
+
 
 
 
