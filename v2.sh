@@ -66,10 +66,11 @@ show_menu() {
     local VERSION="1.4"
     local status_line
     status_line=$(check_v2ray_status)
-
+    
     echo -e "${CYAN}╔════════════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}          • V2Ray MENU •     version $VERSION     ${NC}"
     echo -e "[${status_line}]"
+    echo -e "🕒 La hora actual en la máquina VPS es: $(date)${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
     echo -e "1. ${GREEN}➕ Agregar nuevo usuario${NC}"
     echo -e "2. ${RED}🗑 Eliminar usuario${NC}"
@@ -227,25 +228,56 @@ edit_user_uuid() {
         return
     fi
 
+    
+    oldUserData=$(grep "$userId" /etc/v2ray/v2clientes.txt)
+
+    
+    sed -i "/$userId/d" "$USERS_FILE"
+
     read -p "Ingrese el nuevo UUID para el usuario con ID $userId: " newUuid
 
-    if ! [[ "$newUuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+    if [[ ! "$newUuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{1,12}[a-zA-Z0-9]$ ]]; then
         print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
         return
     fi
 
-    if grep -q "$newUuid" "$USERS_FILE"; then
-        print_message "${RED}" "Advertencia: Ya existe un usuario con el mismo UUID. No se puede asignar el mismo UUID a múltiples usuarios."
-        return
+    # Busca el nombre del usuario anterior
+    oldName=$(echo "$oldUserData" | awk -F "|" '{print $2}')
+
+    read -p "Ingrese el nuevo nombre para el usuario con ID $userId (o presione Enter para conservar el nombre $oldName): " newName
+
+    if [ -z "$newName" ]; then
+        newName=$oldName
     fi
 
-    jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(if .id == \"$userId\" then .id = \"$newUuid\" else . end))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    read -p "Ingrese el número de días para la fecha de expiración (o presione Enter para conservar la fecha del usuario anterior): " expiryDays
 
-    sed -i "s/$userId/$newUuid/" "$USERS_FILE"
+    if [ -z "$expiryDays" ]; then
+        oldDate=$(echo "$oldUserData" | awk -F "|" '{print $3}' | xargs)
+        newDate=$oldDate
+    else
+        newDate=$(date -d "+$expiryDays days" "+%Y-%m-%d")
+    fi
 
+    
+    sleep 2
+    sed -i "/$userId/d" /etc/v2ray/v2clientes.txt
+
+    
+    echo "$newUuid | $newName | $newDate" >> /etc/v2ray/v2clientes.txt
+
+    
+    jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(if .id == \"$userId\" then .id = \"$newUuid\" | .email = \"$newName\" else . end))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+
+    
     systemctl restart v2ray
+
     print_message "${GREEN}" "UUID del usuario con ID $userId editado exitosamente."
 }
+
+
+
+
 
 create_backup() {
     read -p "Ingrese el nombre del archivo de respaldo: " backupFileName
