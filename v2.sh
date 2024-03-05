@@ -68,9 +68,9 @@ show_menu() {
     status_line=$(check_v2ray_status)
     
     echo -e "${CYAN}╔════════════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}          • V2Ray MENU •     version $VERSION     ${NC}"
+    echo -e "${YELLOW}          • Menú V2Ray •     versión $VERSION     ${NC}"
     echo -e "[${status_line}]"
-    echo -e "🕒 La hora actual en la máquina VPS es: $(date)${NC}"
+    echo -e "🕒 La hora actual en la máquina VPS es: $(date '+%H:%M:%S %d-%m-%Y')${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
     echo -e "1. ${GREEN}➕ Agregar nuevo usuario${NC}"
     echo -e "2. ${RED}🗑 Eliminar usuario${NC}"
