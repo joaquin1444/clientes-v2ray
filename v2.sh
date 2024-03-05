@@ -63,29 +63,28 @@ check_v2ray_status() {
 
 
 show_menu() {
-       local VERSION="1.4"
-       local status_line
-       status_line=$(check_v2ray_status)
-       hora_argentina=$(TZ="America/Argentina/Buenos_Aires" date '+%H:%M:%S %d-%m-%Y')
-       
-       echo -e "${CYAN}╔════════════════════════════════════════════════════╗${NC}"
-       echo -e "${YELLOW}          • Menú V2Ray •     versión $VERSION     ${NC}"
-       echo -e "[${status_line}]"
-       echo -e "🕒 La hora actual en la máquina VPS es: $hora_argentina${NC}"
-       echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
-       echo -e "1. ${GREEN}➕ Agregar nuevo usuario${NC}"
-       echo -e "2. ${RED}🗑 Eliminar usuario${NC}"
-       echo -e "3. ${YELLOW}🔄 Editar UUID de usuario${NC}"
-       echo -e "4. ${YELLOW}👥 Ver información de usuarios${NC}"
-       echo -e "5. ${YELLOW}ℹ️ Ver información de vmess${NC}"
-       echo -e "6. ${YELLOW}📂 Gestión de copias de seguridad${NC}"
-       echo -e "7. ${YELLOW}🔄 Cambiar el path de V2Ray${NC}"
-       echo -e "8. ${YELLOW}🚀 Entrar al V2Ray nativo${NC}"
-       echo -e "9. ${YELLOW}🔧 Instalar/Desinstalar V2Ray${NC}"
-       echo -e "10. ${YELLOW}🚪 Salir${NC}"
-       echo -e "${CYAN}╚════════════════════════════════════════════════════╝${NC}"
-       echo -e "${BLUE}⚙️ Acceder al menú con V2${NC}"
-   }
+    local VERSION="1.4"
+    local status_line
+    status_line=$(check_v2ray_status)
+
+    echo -e "\e[36m╔════════════════════════════════════════════════════╗\e[0m"
+    echo -e "\e[33m          • Menú V2Ray •     versión $VERSION     \e[0m"
+    echo -e "[${status_line}]"
+    echo -e "\e[36m╚════════════════════════════════════════════════════╝\e[0m"
+    echo -e "\e[36m\e[31m[1]\e[0m \e[32m➕ Agregar nuevo usuario\e[0m"
+    echo -e "\e[36m\e[32m[2]\e[0m \e[31m🗑 Eliminar usuario\e[0m"
+    echo -e "\e[36m\e[33m[3]\e[0m \e[33m🔄 Editar UUID de usuario\e[0m"
+    echo -e "\e[36m\e[34m[4]\e[0m \e[33m👥 Ver información de usuarios\e[0m"
+    echo -e "\e[36m\e[35m[5]\e[0m \e[33mℹ️ Ver información de vmess\e[0m"
+    echo -e "\e[36m\e[36m[6]\e[0m \e[33m📂 Gestión de copias de seguridad\e[0m"
+    echo -e "\e[36m\e[37m[7]\e[0m \e[33m🔄 Cambiar el path de V2Ray\e[0m"
+    echo -e "\e[36m\e[91m[8]\e[0m \e[33m🚀 Entrar al V2Ray nativo\e[0m"
+    echo -e "\e[36m\e[92m[9]\e[0m \e[33m🔧 Instalar/Desinstalar V2Ray\e[0m"
+    echo -e "\e[36m\e[93m[10]\e[0m \e[33m🚪 Salir\e[0m"
+    echo -e "\e[36m╚════════════════════════════════════════════════════╝\e[0m"
+    echo -e "\e[34m⚙️ Acceder al menú con V2\e[0m"
+}
+
 
 
 show_backup_menu() {
