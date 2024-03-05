@@ -63,7 +63,8 @@ check_v2ray_status() {
 
 
 show_menu() {
-    local VERSION="1.4"
+    clear
+    local VERSION="1.5"
     local status_line
     status_line=$(check_v2ray_status)
 
@@ -88,9 +89,11 @@ show_menu() {
 
 
 show_backup_menu() {
+    clear
     echo -e "${YELLOW}Opciones de v2ray backup:${NC}"
     echo -e "1. ${GREEN}Crear copia de seguridad${NC}"
     echo -e "2. ${RED}Restaurar copia de seguridad${NC}"
+    echo -e "3. Volver al menú principal"
     echo -e "${CYAN}==========================${NC}"
     read -p "Seleccione una opción: " backupOption
 
@@ -101,6 +104,9 @@ show_backup_menu() {
         2)
             restore_backup
             ;;
+        3)
+            main_menu  # Llama a la función del menú principal
+            ;;
         *)
             print_message "${RED}" "Opción no válida."
             ;;
@@ -109,22 +115,27 @@ show_backup_menu() {
 
 
 add_user() {
+    clear
     print_message "${CYAN}" "Agregar Nuevo Usuario"
 
     read -p "$(echo -e "${YELLOW}Ingrese el nombre del nuevo usuario:${NC} ")" userName
 
     
     if grep -q "| $userName |" "$USERS_FILE"; then
-        print_message "${RED}" "Ya existe un usuario con el mismo nombre. Por favor, elija otro nombre."
-        return 1
-    fi
+    print_message "${RED}" "Ya existe un usuario con el mismo nombre. Por favor, elija otro nombre."
+    read -p "Presione Enter para regresar al menú principal" enterKey
+    clear
+    return 1
+fi
 
     read -p "$(echo -e "${YELLOW}Ingrese la duración en días para el nuevo usuario:${NC} ")" days
 
-    if ! [[ "$days" =~ ^[0-9]+$ ]]; then
-        print_message "${RED}" "La duración debe ser un número."
-        return 1
-    fi
+if ! [[ "$days" =~ ^[0-9]+$ ]]; then
+    print_message "${RED}" "La duración debe ser un número."
+    read -p "Presione Enter para regresar al menú principal" enterKey
+    clear
+    return 1
+fi
 
     read -p "$(echo -e "${YELLOW}¿Desea ingresar un UUID personalizado? (Sí: S, No: cualquier tecla):${NC} ")" customUuidChoice
 
@@ -133,9 +144,11 @@ add_user() {
 
         
         if ! [[ "$userId" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
-            print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-            return 1
-        fi
+    print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+    read -p "Presione Enter para regresar al menú principal" enterKey
+    clear
+    return 1
+fi
 
         
         if grep -q "$userId" "$USERS_FILE"; then
@@ -163,6 +176,7 @@ add_user() {
 
     systemctl restart v2ray
     print_message "${GREEN}" "Usuario agregado exitosamente."
+read -p "Presione Enter para regresar al menú principal" enterKey
 }
 
 
@@ -170,8 +184,10 @@ add_user() {
 
 
 delete_user() {
-    print_message "${CYAN}" "⚠️ Advertencia: los expirados Se recomienda eliminarlo manualmente con el ID⚠️ "
-    show_registered_users
+    clear
+    print_message "${CYAN}" "⚠️ Advertencia: los usuarios expirados se recomienda eliminarlos manualmente con el ID ⚠️ "
+    show_registered_user
+
     read -p "Ingrese el ID del usuario que desea eliminar (o presione Enter para cancelar): " userId
 
     if [ -z "$userId" ]; then
@@ -179,16 +195,9 @@ delete_user() {
         return
     fi
 
-    
     jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(select(.id != \"$userId\")))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
-
-    
-    if [ -n "$userId" ]; then
-        sed -i "/$userId/d" "$USERS_FILE"
-        print_message "${RED}" "Usuario con ID $userId eliminado."
-    fi
-
-    
+    sed -i "/$userId/d" "$USERS_FILE"
+    print_message "${RED}" "Usuario con ID $userId eliminado."
     systemctl restart v2ray
 }
 
@@ -220,11 +229,12 @@ delete_user_by_uuid() {
 }
 
 edit_user_uuid() {
-    show_registered_users
+    show_registered_user
     read -p "Ingrese el ID del usuario que desea editar (o presione Enter para cancelar): " userId
 
     if [ -z "$userId" ]; then
         print_message "${YELLOW}" "No se seleccionó ningún ID. Volviendo al menú principal."
+        read -p "Presione Enter para regresar al menú principal" enterKey
         return
     fi
 
@@ -236,19 +246,22 @@ edit_user_uuid() {
 
     read -p "Ingrese el nuevo UUID para el usuario con ID $userId: " newUuid
 
-    if [[ ! "$newUuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{1,12}[a-zA-Z0-9]$ ]]; then
-        print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-        return
-    fi
+    if [[ ! "$newUuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
+    print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+    read -p "Presione Enter para regresar al menú principal" enterKey
+    return
+fi
 
     # Busca el nombre del usuario anterior
     oldName=$(echo "$oldUserData" | awk -F "|" '{print $2}')
 
     read -p "Ingrese el nuevo nombre para el usuario con ID $userId (o presione Enter para conservar el nombre $oldName): " newName
 
-    if [ -z "$newName" ]; then
-        newName=$oldName
-    fi
+newName=$(echo $newName | xargs)  # Esto eliminará los espacios en blanco al principio y al final del nombre
+
+if [ -z "$newName" ]; then
+    newName=$(echo "$oldName" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+fi
 
     read -p "Ingrese el número de días para la fecha de expiración (o presione Enter para conservar la fecha del usuario anterior): " expiryDays
 
@@ -273,21 +286,25 @@ edit_user_uuid() {
     systemctl restart v2ray
 
     print_message "${GREEN}" "UUID del usuario con ID $userId editado exitosamente."
+    read -p "Presione Enter para regresar al menú principal" enterKey
+return
 }
-
 
 
 
 
 create_backup() {
+    clear
     read -p "Ingrese el nombre del archivo de respaldo: " backupFileName
     backupFilePath="/root/$backupFileName"  
     cp $CONFIG_FILE "$backupFilePath"_config.json
     cp $USERS_FILE "$backupFilePath"_v2clientes.txt
     print_message "${GREEN}" "Copia de seguridad creada en: $backupFilePath"
+    read -p "Presione Enter para continuar"
 }
 
 show_backups() {
+    clear
     echo -e "\e[1m\e[34mBackups disponibles:\e[0m"
     
     for backupFile in /root/*_config.json; do
@@ -305,6 +322,7 @@ show_backups() {
 }
 
 show_vmess_by_uuid() {
+    clear
     show_registered_users
     read -p "Ingrese el UUID del usuario para ver la información de vmess (presiona Enter para volver al menú principal): " userUuid
 
@@ -339,8 +357,8 @@ show_vmess_by_uuid() {
     echo "Fecha de Expiración: $expiration_date"
     echo "=========================="
 }
-
-show_registered_users() {
+show_registered_user() {
+    clear
     print_message "${CYAN}" "Información de Usuarios:"
     echo "=============================================================================================="
     echo "UUID                                 Nombre             Fecha de Expiración   Días Restantes"
@@ -349,44 +367,81 @@ show_registered_users() {
     current_time=$(date +%s)
 
     while IFS='|' read -r uuid nombre fecha_expiracion || [[ -n "$uuid" ]]; do
-        
-        uuid=$(echo "$uuid" | tr -d '[:space:]')
-        nombre=$(echo "$nombre" | tr -d '[:space:]')
-        fecha_expiracion=$(echo "$fecha_expiracion" | tr -d '[:space:]')
-
         expiracion_timestamp=$(date -d "$fecha_expiracion" +%s)
         dias_restantes=$(( (expiracion_timestamp - current_time + 86399) / 86400 ))
 
-        
         if [ "$current_time" -ge "$expiracion_timestamp" ]; then
             color="${RED}"
         else
             color="${GREEN}"
         fi
 
-        
         fecha_expiracion_formateada=$(date -d "$fecha_expiracion" +"%Y-%m-%d")
         printf "%s %-37s %-20s %-20s %-20s\n" "$color" "$uuid" "$nombre" "$fecha_expiracion_formateada" "$dias_restantes"
-    done < <(sort -t'|' -k3,3nr "/etc/v2ray/v2clientes.txt")
+    done < "/etc/v2ray/v2clientes.txt" | sort -t'|' -k3,3nr
 
     echo "=============================================================================================="
 }
 
+show_registered_users() {
+    clear
+    print_message "${CYAN}" "Información de Usuarios:"
+    echo "=============================================================================================="
+    echo "UUID                                 Nombre             Fecha de Expiración   Días Restantes"
+    echo "=============================================================================================="
 
+    current_time=$(date +%s)
 
+    # Ordenar el archivo v2clientes.txt por fecha de expiración en orden ascendente
+    sorted_file=$(mktemp)
+    sort -t'|' -k4,4n /etc/v2ray/v2clientes.txt > "${sorted_file}"
 
-cambiar_path() {
-    read -p "Introduce el nuevo path: " nuevo_path
+    while IFS='|' read -r uuid nombre fecha_expiracion || [[ -n "$uuid" ]]; do
+        expiracion_timestamp=$(date -d "$fecha_expiracion" +%s)
+        dias_restantes=$(( (expiracion_timestamp - current_time + 86399) / 86400 ))
 
-    
-    jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+        if [ "$current_time" -ge "$expiracion_timestamp" ]; then
+            color="${RED}"
+        else
+            color="${GREEN}"
+        fi
 
-    echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
+        fecha_expiracion_formateada=$(date -d "$fecha_expiracion" +"%Y-%m-%d")
+        printf "%s %-37s %-20s %-20s %-20s\n" "$color" "$uuid" "$nombre" "$fecha_expiracion_formateada" "$dias_restantes"
+    done < <(sort -t'|' -k5nr,5 /etc/v2ray/v2clientes.txt)
 
-    
-    systemctl restart v2ray
+    rm "${sorted_file}"  # Eliminar el archivo temporal
+
+    echo "=============================================================================================="
+    read -p "Presione Enter para regresar al menú principal" enterKey
 }
 
+cambiar_path() {
+    clear
+    while true; do
+        read -p "Selecciona una opción:
+1. Cambiar el nuevo path
+2. Volver al menú principal
+Opción: " opcion
+
+        case $opcion in
+            1)
+                read -p "Introduce el nuevo path: " nuevo_path
+                jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+                echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
+                systemctl restart v2ray
+                read -p "Presione Enter para regresar al menú principal" enterKey
+                return
+                ;;
+            2)
+                return
+                ;;
+            *)
+                echo "Opción inválida. Por favor, selecciona una opción válida."
+                ;;
+        esac
+    done
+}
 
 
 
@@ -399,11 +454,14 @@ restore_backup() {
         cp "/root/${backupFileName}_config.json" $CONFIG_FILE
         cp "/root/${backupFileName}_v2clientes.txt" $USERS_FILE
         print_message "${GREEN}" "Copia de seguridad '$backupFileName' restaurada."
-
+        read -p "Presione Enter para regresar al menú principal" enterKey
+return
         # Restart V2Ray
         systemctl restart v2ray
     else
         print_message "${RED}" "Error: El archivo de respaldo '$backupFileName' no existe."
+        read -p "Presione Enter para regresar al menú principal" enterKey
+return
     fi
 }
 
@@ -412,39 +470,42 @@ restore_backup() {
 
 
 show_vmess_by_uuid() {
-    show_registered_users
+    show_registered_user
     read -p "Ingrese el UUID del usuario para ver la información de vmess (presiona Enter para volver al menú principal): " userUuid
 
     if [ -z "$userUuid" ]; then
-        print_message "${YELLOW}" "Volviendo al menú principal."
-        return
-    fi
+    print_message "${YELLOW}" "Volviendo al menú principal."
+    read -p "Presione Enter para continuar"
+    return
+fi
 
     user_info=$(grep "$userUuid" $USERS_FILE)
 
     if [ -z "$user_info" ]; then
         print_message "${RED}" "UUID no encontrado. Volviendo al menú principal."
+        read -p "Presione Enter para continuar"
         return
     fi
 
     
     user_name=$(echo $user_info | awk -F'|' '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')  
-    expiration_date=$(echo $user_info | awk -F'|' '{print $4}' | sed 's/^[ \t]*//;s/[ \t]*$//')  
+expiration_date=$(echo $user_info | awk -F'|' '{print $4}' | sed 's/^[ \t]*//;s/[ \t]*$//')  
 
-    
-    print_message "${CYAN}" "Información de vmess del usuario con UUID $userUuid:"
-    echo "=========================="
-    echo "Group: A"
-    echo "IP: 186.148.224.202"
-    echo "Port: 80"
-    echo "TLS: close"
-    echo "Email: $user_name"
-    echo "UUID: $userUuid"
-    echo "Alter ID: 0"
-    echo "Network: WebSocket host: ssh-fastly.panda1.store, path: privadoAR"
-    echo "TcpFastOpen: open"
-    echo "Fecha de Expiración: $expiration_date"
-    echo "=========================="
+print_message "${CYAN}" "Información de vmess del usuario con UUID $userUuid:"
+echo "=========================="
+echo "Group: A"
+echo "IP: 186.148.224.202"
+echo "Port: 80"
+echo "TLS: close"
+echo "Email: $user_name"
+echo "UUID: $userUuid"
+echo "Alter ID: 0"
+echo "Network: WebSocket host: ssh-fastly.panda1.store, path: privadoAR"
+echo "TcpFastOpen: open"
+echo "Fecha de Expiración: $expiration_date"
+echo "=========================="
+
+read -p "Presione Enter para continuar"
 }
 
 
@@ -459,7 +520,6 @@ entrar_v2ray_original() {
     print_message "${CYAN}" "Has entrado al menú nativo de V2Ray."
 }
 
-#!/bin/bash
 
 
 archivo="/etc/v2ray/v2clientes.txt"
@@ -514,13 +574,14 @@ while true; do
             show_backup_menu
             ;;
         7)
-            entrar_v2ray_original
+            cambiar_path
             ;;
         8)
-            cambiar_path
+            entrar_v2ray_original
             ;;
         9)
             while true; do
+            clear
     echo -e "${CYAN}Seleccione una opción para V2Ray:${NC}"
     echo -e "1. ${GREEN}Instalar V2Ray${NC}"
     echo -e "2. ${RED}Desinstalar V2Ray${NC}"
