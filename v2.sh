@@ -64,7 +64,7 @@ check_v2ray_status() {
 
 show_menu() {
     clear
-    local VERSION="1.5"
+    local VERSION="1.6"
     local status_line
     status_line=$(check_v2ray_status)
 
@@ -78,10 +78,9 @@ show_menu() {
     echo -e "\e[36m\e[34m[4]\e[0m \e[33m👥 Ver información de usuarios\e[0m"
     echo -e "\e[36m\e[35m[5]\e[0m \e[33mℹ️ Ver información de vmess\e[0m"
     echo -e "\e[36m\e[36m[6]\e[0m \e[33m📂 Gestión de copias de seguridad\e[0m"
-    echo -e "\e[36m\e[37m[7]\e[0m \e[33m🔄 Cambiar el path de V2Ray\e[0m"
-    echo -e "\e[36m\e[91m[8]\e[0m \e[33m🚀 Entrar al V2Ray nativo\e[0m"
-    echo -e "\e[36m\e[92m[9]\e[0m \e[33m🔧 Instalar/Desinstalar V2Ray\e[0m"
-    echo -e "\e[36m\e[93m[10]\e[0m \e[33m🚪 Salir\e[0m"
+    echo -e "\e[36m\e[91m[7]\e[0m \e[33m🚀 Entrar al V2Ray nativo\e[0m"
+    echo -e "\e[36m\e[92m[8]\e[0m \e[33m🔧 configurar v2ray\e[0m"
+    echo -e "\e[36m\e[93m[9]\e[0m \e[33m🚪 Salir\e[0m"
     echo -e "\e[36m╚════════════════════════════════════════════════════╝\e[0m"
     echo -e "\e[34m⚙️ Acceder al menú con V2\e[0m"
 }
@@ -574,44 +573,115 @@ while true; do
             show_backup_menu
             ;;
         7)
-            cambiar_path
-            ;;
-        8)
             entrar_v2ray_original
             ;;
-        9)
+        8)
             while true; do
-            clear
-    echo -e "${CYAN}Seleccione una opción para V2Ray:${NC}"
-    echo -e "1. ${GREEN}Instalar V2Ray${NC}"
-    echo -e "2. ${RED}Desinstalar V2Ray${NC}"
-    echo -e "3. ${YELLOW}Volver al menú principal${NC}"
-    read -r install_option
+                clear
+                echo -e "${CYAN}Seleccione una opción para V2Ray:${NC}"
+                echo -e "1. ${GREEN}Instalar V2Ray${NC}"
+                echo -e "2. ${RED}Desinstalar V2Ray${NC}"
 
-    case $install_option in
-        1)
-            echo -e "${YELLOW}Instalando V2Ray...${NC}"
-            bash -c "$(curl -fsSL https://megah.shop/v2ray)"
-            ;;
-        2)
-            echo -e "${RED}Desinstalando V2Ray...${NC}"
-            systemctl stop v2ray
-            systemctl disable v2ray
-            rm -rf /usr/bin/v2ray /etc/v2ray
-            echo -e "${GREEN}V2Ray desinstalado.${NC}"
-            ;;
-        3)
-            echo -e "${YELLOW}Volviendo al menú principal...${NC}"
-            break  
-            ;;
-        *)
-            echo -e "${RED}Opción no válida. Por favor, intenta de nuevo.${NC}"
-            ;;
-    esac
-done
+                
+                optimize_status="[${RED}off${NC}]" 
+                if [[ -e "/etc/cron.d/optimize-ubuntu" ]]; then
+                    optimize_status="[${GREEN}on${NC}]" 
+                fi
+
+                echo -e "3. ${YELLOW}Optimizar VPS ${optimize_status}${NC}"
+                echo -e "4. ${GREEN}Cambiar el path de V2Ray${NC}"
+                echo -e "5. ${YELLOW}Volver al menú principal${NC}"
+                read -r main_option
+
+                case $main_option in
+                    1)
+                        echo "Instalando V2Ray..."
+                        bash -c "$source <(curl -sL https://multi.netlify.app/v2ray.sh)"
+                        ;;
+                    2)
+                        echo "Desinstalando V2Ray..."
+                        
+                        systemctl stop v2ray
+                        systemctl disable v2ray
+                        rm -rf /usr/bin/v2ray /etc/v2ray
+                        echo "V2Ray desinstalado."
+                        ;;
+                    3)
+                        echo -e "${CYAN}Seleccione una opción para optimizar VPS:${NC}"
+                        echo -e "1. ${GREEN}Cada 30 minutos${NC}"
+                        echo -e "2. ${GREEN}Cada 1 hora${NC}"
+                        echo -e "3. ${GREEN}Cada 3 horas${NC}"
+                        echo -e "4. ${GREEN}Cada 9 horas${NC}"
+                        echo -e "5. ${GREEN}Cada 24 horas${NC}"
+                        echo -e "6. ${GREEN}tiempo personalizado${NC}"
+                        echo -e "7. ${RED}Desactivar optimización${NC}"
+                        read -r optimize_option
+
+                        case $optimize_option in
+                            1) 
+                                
+                                echo "0,30 * * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
+                                echo -e "${GREEN}Servicio de optimización activado cada 30 minutos${NC}"
+                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
+                                ;;
+                            2) 
+                                
+                                echo "0 * * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
+                                echo -e "${GREEN}Servicio de optimización activado cada 1 hora${NC}"
+                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
+                                ;;
+                            3) 
+                                
+                                echo "0 */3 * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
+                                echo -e "${GREEN}Servicio de optimización activado cada 3 horas${NC}"
+                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
+                                ;;
+                            4) 
+                                
+                                echo "0 */9 * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
+                                echo -e "${GREEN}Servicio de optimización activado cada 9 horas${NC}"
+                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
+                                ;;
+                            5) 
+                                
+                                echo "0 0 * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
+                                echo -e "${GREEN}Servicio de optimización activado cada 24 horas${NC}"
+                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
+                                ;;
+                            6) 
+                                
+                                echo -e "${CYAN}Ingrese los minutos para la optimización (ej. 15, 45):${NC}"
+                                read -r custom_minutes
+                                echo "${custom_minutes} * * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
+                                echo -e "${GREEN}Servicio de optimización activado cada ${custom_minutes} minutos${NC}"
+                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
+                                ;;
+                            7)
+                                
+                                sudo rm -f /etc/cron.d/optimize-ubuntu
+                                echo -e "${RED}Servicio de optimización desactivado${NC}"
+                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
+                                ;;
+                            *) 
+                                echo -e "${RED}Opción no válida${NC}"
+                                ;;
+                        esac
+                        ;;
+                        4)
+                        cambiar_path
+                        ;;
+                    5)
+                        echo "Volviendo al menú principal..."
+                        break
+                        ;;
+                    *)
+                        echo -e "${RED}Opción no válida${NC}"
+                        ;;
+                esac
+            done
 
             ;;
-        10)
+        9)
             echo "Saliendo..."
             exit 0  
             ;;
