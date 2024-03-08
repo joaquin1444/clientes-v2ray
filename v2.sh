@@ -6,7 +6,7 @@ echo "alias v2='/root/v2.sh'" >> ~/.bashrc
 
 source ~/.bashrc
 
-sudo timedatectl set-timezone America/Argentina/Buenos_Aires
+
 CONFIG_FILE="/etc/v2ray/config.json"
 
 USERS_FILE="/etc/v2ray/v2clientes.txt"
