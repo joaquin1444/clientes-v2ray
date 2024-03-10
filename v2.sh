@@ -6,7 +6,6 @@ echo "alias v2='/root/v2.sh'" >> ~/.bashrc
 
 source ~/.bashrc
 
-
 CONFIG_FILE="/etc/v2ray/config.json"
 
 USERS_FILE="/etc/v2ray/v2clientes.txt"
@@ -64,7 +63,7 @@ check_v2ray_status() {
 
 show_menu() {
     clear
-    local VERSION="1.6"
+    local VERSION="1.7"
     local status_line
     status_line=$(check_v2ray_status)
 
@@ -415,32 +414,7 @@ show_registered_users() {
     read -p "Presione Enter para regresar al menú principal" enterKey
 }
 
-cambiar_path() {
-    clear
-    while true; do
-        read -p "Selecciona una opción:
-1. Cambiar el nuevo path
-2. Volver al menú principal
-Opción: " opcion
 
-        case $opcion in
-            1)
-                read -p "Introduce el nuevo path: " nuevo_path
-                jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
-                echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
-                systemctl restart v2ray
-                read -p "Presione Enter para regresar al menú principal" enterKey
-                return
-                ;;
-            2)
-                return
-                ;;
-            *)
-                echo "Opción inválida. Por favor, selecciona una opción válida."
-                ;;
-        esac
-    done
-}
 
 
 
@@ -543,7 +517,128 @@ cambiar_formatos_y_eliminar_dias() {
     done < "$archivo"
 }
 
+# Función para reiniciar V2Ray
+restart_v2ray() {
+    systemctl restart v2ray
+}
 
+cambiar_path() {
+    clear
+    echo "Entrando en la función cambiar_path..."
+
+    while true; do
+        read -p "Selecciona una opción:
+1. Cambiar el nuevo path
+2. Volver al menú principal
+Opción: " opcion
+
+        case $opcion in
+            1)
+                echo "Seleccionaste cambiar el path..."
+                read -p "Introduce el nuevo path: " nuevo_path
+                echo "Modificando el path a $nuevo_path en el archivo de configuración..."
+
+                # Verificar que jq esté instalado
+                if ! command -v jq &> /dev/null; then
+                    echo "Error: 'jq' no está instalado. Instálalo para continuar."
+                    return
+                fi
+
+                # Verificar que el archivo de configuración exista
+                if [ ! -f "$CONFIG_FILE" ]; then
+                    echo "Error: El archivo de configuración '$CONFIG_FILE' no existe."
+                    return
+                fi
+
+                # Modificar el archivo de configuración con jq
+                jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+
+                # Verificar si hubo errores al ejecutar jq
+                if [ $? -eq 0 ]; then
+                    echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
+                    systemctl restart v2ray
+                    read -p "Presiona Enter para regresar al menú principal" enterKey
+                    return
+                else
+                    echo "Error al modificar el archivo de configuración con jq."
+                    read -p "Presiona Enter para regresar al menú principal" enterKey
+                    return
+                fi
+                ;;
+            2)
+                echo "Seleccionaste volver al menú principal..."
+                return
+                ;;
+            *)
+                echo "Opción inválida. Por favor, selecciona una opción válida."
+                ;;
+        esac
+    done
+}
+
+
+configurar_temporizador() {
+    while true; do
+        clear
+        echo -e "${CYAN}-----------------------------------------${NC}"
+        echo -e "${CYAN}Selecciona el intervalo de tiempo:${NC}"
+        echo -e "1. ${GREEN}5 minutos${NC}"
+        echo -e "2. ${GREEN}30 minutos${NC}"
+        echo -e "3. ${GREEN}1 hora${NC}"
+        echo -e "4. ${RED}Desactivar temporizador${NC}"
+        echo -e "5. ${YELLOW}Salir${NC}"
+        echo -e "${CYAN}-----------------------------------------${NC}"
+
+        read -p "Selecciona una opción (1-5): " opcion
+
+        case $opcion in
+            1)
+                configurar_temporizador_con_intervalo "5:00"
+                ;;
+            2)
+                configurar_temporizador_con_intervalo "30:00"
+                ;;
+            3)
+                configurar_temporizador_con_intervalo "59:00"
+                ;;
+            4)
+                desactivar_temporizador
+                ;;
+            5)
+                echo "Volviendo al menú principal..."
+                return  # Usa 'return' para salir de la función
+                ;;
+            "")
+                echo "Volviendo al menú principal..."
+                return  # También usa 'return' para salir de la función en caso de pulsar Enter
+                ;;
+            *)
+                echo -e "${RED}Opción no válida. Por favor, selecciona una opción válida.${NC}"
+                ;;
+        esac
+
+        read -p "Presiona Enter para continuar..."
+    done
+}
+
+
+
+configurar_temporizador_con_intervalo() {
+    intervalo=$1
+    timer_unit="[Timer]\nOnCalendar=*-*-* *:00/$intervalo\nPersistent=true\nUnit=reiniciador.service\n"
+
+    echo -e "$timer_unit" | sudo tee /etc/systemd/system/temporizador.timer > /dev/null
+    sudo systemctl daemon-reload
+    sudo systemctl restart temporizador.timer
+
+    echo "Configuración completa."
+}
+
+desactivar_temporizador() {
+    sudo systemctl stop temporizador.timer
+    sudo systemctl disable temporizador.timer
+    echo "Temporizador desactivado."
+}
 
 cambiar_formatos_y_eliminar_dias
 
@@ -577,109 +672,68 @@ while true; do
             ;;
         8)
             while true; do
-                clear
-                echo -e "${CYAN}Seleccione una opción para V2Ray:${NC}"
-                echo -e "1. ${GREEN}Instalar V2Ray${NC}"
-                echo -e "2. ${RED}Desinstalar V2Ray${NC}"
+    clear
+    echo -e "${CYAN}Seleccione una opción para V2Ray:${NC}"
+    echo -e "1. ${GREEN}Instalar V2Ray${NC}"
+    echo -e "2. ${RED}Desinstalar V2Ray${NC}"
+    
+    # Detectar el estado de configurar_temporizador
+    if systemctl is-active --quiet temporizador.timer; then
+        optimize_status="[${GREEN}on${NC}]"
+    else
+        optimize_status="[${RED}off${NC}]"
+    fi
 
-                
-                optimize_status="[${RED}off${NC}]" 
-                if [[ -e "/etc/cron.d/optimize-ubuntu" ]]; then
-                    optimize_status="[${GREEN}on${NC}]" 
-                fi
+    echo -e "3. ${YELLOW}Reiniciar V2Ray Aut. ${optimize_status}${NC}"
+    echo -e "4. ${GREEN}Cambiar el path de V2Ray${NC}"
+    echo -e "5. ${YELLOW}Volver al menú principal${NC}"
 
-                echo -e "3. ${YELLOW}Optimizar VPS ${optimize_status}${NC}"
-                echo -e "4. ${GREEN}Cambiar el path de V2Ray${NC}"
-                echo -e "5. ${YELLOW}Volver al menú principal${NC}"
-                read -r main_option
+    read -r main_option
 
                 case $main_option in
-                    1)
+                    1) 
                         echo "Instalando V2Ray..."
-                        bash -c "$source <(curl -sL https://multi.netlify.app/v2ray.sh)"
-                        ;;
-                    2)
-                        echo "Desinstalando V2Ray..."
-                        
-                        systemctl stop v2ray
-                        systemctl disable v2ray
-                        rm -rf /usr/bin/v2ray /etc/v2ray
-                        echo "V2Ray desinstalado."
-                        ;;
-                    3)
-                        echo -e "${CYAN}Seleccione una opción para optimizar VPS:${NC}"
-                        echo -e "1. ${GREEN}Cada 30 minutos${NC}"
-                        echo -e "2. ${GREEN}Cada 1 hora${NC}"
-                        echo -e "3. ${GREEN}Cada 3 horas${NC}"
-                        echo -e "4. ${GREEN}Cada 9 horas${NC}"
-                        echo -e "5. ${GREEN}Cada 24 horas${NC}"
-                        echo -e "6. ${GREEN}tiempo personalizado${NC}"
-                        echo -e "7. ${RED}Desactivar optimización${NC}"
-                        read -r optimize_option
+                        # Descargar e instalar V2Ray
+    bash <(curl -L -s https://install.direct/go.sh)
 
-                        case $optimize_option in
-                            1) 
-                                
-                                echo "0,30 * * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
-                                echo -e "${GREEN}Servicio de optimización activado cada 30 minutos${NC}"
-                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
-                                ;;
-                            2) 
-                                
-                                echo "0 * * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
-                                echo -e "${GREEN}Servicio de optimización activado cada 1 hora${NC}"
-                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
-                                ;;
-                            3) 
-                                
-                                echo "0 */3 * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
-                                echo -e "${GREEN}Servicio de optimización activado cada 3 horas${NC}"
-                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
-                                ;;
-                            4) 
-                                
-                                echo "0 */9 * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
-                                echo -e "${GREEN}Servicio de optimización activado cada 9 horas${NC}"
-                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
-                                ;;
-                            5) 
-                                
-                                echo "0 0 * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
-                                echo -e "${GREEN}Servicio de optimización activado cada 24 horas${NC}"
-                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
-                                ;;
-                            6) 
-                                
-                                echo -e "${CYAN}Ingrese los minutos para la optimización (ej. 15, 45):${NC}"
-                                read -r custom_minutes
-                                echo "${custom_minutes} * * * * root /sbin/sysctl -w vm.drop_caches=3 && v2ray clean && systemctl restart v2ray" | sudo tee /etc/cron.d/optimize-ubuntu
-                                echo -e "${GREEN}Servicio de optimización activado cada ${custom_minutes} minutos${NC}"
-                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
-                                ;;
-                            7)
-                                
-                                sudo rm -f /etc/cron.d/optimize-ubuntu
-                                echo -e "${RED}Servicio de optimización desactivado${NC}"
-                                read -p "${CYAN}Presiona Enter para continuar...${NC}"
-                                ;;
-                            *) 
-                                echo -e "${RED}Opción no válida${NC}"
-                                ;;
-                        esac
+    # Verificar el estado del servicio V2Ray
+    if systemctl is-active --quiet v2ray; then
+        echo -e "\033[32mV2Ray se ha instalado correctamente.\033[0m"
+    else
+        echo -e "\033[31m¡La instalación de V2Ray ha fallado!\033[0m"
+    fi
                         ;;
-                        4)
+                    2) 
+                        echo "Desinstalando V2Ray..."
+                         # Detener el servicio V2Ray si está en ejecución
+    sudo systemctl stop v2ray
+
+    # Eliminar el servicio V2Ray
+    sudo systemctl disable v2ray
+    sudo rm -f /etc/systemd/system/v2ray.service
+
+    # Eliminar los archivos de configuración y ejecutables de V2Ray
+    sudo rm -rf /usr/bin/v2ray /etc/v2ray
+
+    # Puedes agregar más acciones de limpieza aquí según tus necesidades
+
+    echo -e "\033[32mV2Ray se ha desinstalado correctamente.\033[0m"
+                        ;;
+                    3) 
+                        configurar_temporizador
+                        ;;
+                    4)
                         cambiar_path
                         ;;
                     5)
                         echo "Volviendo al menú principal..."
-                        break
+                        break  # Salir del bucle while
                         ;;
                     *)
                         echo -e "${RED}Opción no válida${NC}"
                         ;;
                 esac
             done
-
             ;;
         9)
             echo "Saliendo..."
