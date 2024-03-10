@@ -250,12 +250,12 @@ edit_user_uuid() {
     return
 fi
 
-    # Busca el nombre del usuario anterior
+    
     oldName=$(echo "$oldUserData" | awk -F "|" '{print $2}')
 
     read -p "Ingrese el nuevo nombre para el usuario con ID $userId (o presione Enter para conservar el nombre $oldName): " newName
 
-newName=$(echo $newName | xargs)  # Esto eliminará los espacios en blanco al principio y al final del nombre
+newName=$(echo $newName | xargs)  
 
 if [ -z "$newName" ]; then
     newName=$(echo "$oldName" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -390,7 +390,7 @@ show_registered_users() {
 
     current_time=$(date +%s)
 
-    # Ordenar el archivo v2clientes.txt por fecha de expiración en orden ascendente
+    
     sorted_file=$(mktemp)
     sort -t'|' -k4,4n /etc/v2ray/v2clientes.txt > "${sorted_file}"
 
@@ -517,7 +517,7 @@ cambiar_formatos_y_eliminar_dias() {
     done < "$archivo"
 }
 
-# Función para reiniciar V2Ray
+
 restart_v2ray() {
     systemctl restart v2ray
 }
@@ -538,22 +538,22 @@ Opción: " opcion
                 read -p "Introduce el nuevo path: " nuevo_path
                 echo "Modificando el path a $nuevo_path en el archivo de configuración..."
 
-                # Verificar que jq esté instalado
+                
                 if ! command -v jq &> /dev/null; then
                     echo "Error: 'jq' no está instalado. Instálalo para continuar."
                     return
                 fi
 
-                # Verificar que el archivo de configuración exista
+                
                 if [ ! -f "$CONFIG_FILE" ]; then
                     echo "Error: El archivo de configuración '$CONFIG_FILE' no existe."
                     return
                 fi
 
-                # Modificar el archivo de configuración con jq
+                
                 jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
 
-                # Verificar si hubo errores al ejecutar jq
+                
                 if [ $? -eq 0 ]; then
                     echo -e "\033[33mEl path ha sido cambiado a $nuevo_path.\033[0m"
                     systemctl restart v2ray
@@ -606,11 +606,11 @@ configurar_temporizador() {
                 ;;
             5)
                 echo "Volviendo al menú principal..."
-                return  # Usa 'return' para salir de la función
+                return  
                 ;;
             "")
                 echo "Volviendo al menú principal..."
-                return  # También usa 'return' para salir de la función en caso de pulsar Enter
+                return  
                 ;;
             *)
                 echo -e "${RED}Opción no válida. Por favor, selecciona una opción válida.${NC}"
@@ -677,7 +677,7 @@ while true; do
     echo -e "1. ${GREEN}Instalar V2Ray${NC}"
     echo -e "2. ${RED}Desinstalar V2Ray${NC}"
     
-    # Detectar el estado de configurar_temporizador
+    
     if systemctl is-active --quiet temporizador.timer; then
         optimize_status="[${GREEN}on${NC}]"
     else
@@ -692,32 +692,52 @@ while true; do
 
                 case $main_option in
                     1) 
-                        echo "Instalando V2Ray..."
-                        # Descargar e instalar V2Ray
+                        echo -e "\033[33m¿Estás seguro de que quieres instalar V2Ray? (y/n):\033[0m \c"
+read confirm_install
+
+if [ "$confirm_install" = "y" ] || [ "$confirm_install" = "Y" ]; then
+    echo -e "\nInstalando V2Ray..."
+    
     bash <(curl -L -s https://install.direct/go.sh)
 
-    # Verificar el estado del servicio V2Ray
+    
     if systemctl is-active --quiet v2ray; then
         echo -e "\033[32mV2Ray se ha instalado correctamente.\033[0m"
     else
         echo -e "\033[31m¡La instalación de V2Ray ha fallado!\033[0m"
     fi
+    read -p "Presiona Enter para salir..."
+else
+    echo -e "\nOperación de instalación cancelada. Volviendo al menú principal..."
+    read -p "Presiona Enter para salir..."
+fi
                         ;;
                     2) 
-                        echo "Desinstalando V2Ray..."
-                         # Detener el servicio V2Ray si está en ejecución
+                        echo -e "\033[33m¿Estás seguro de que deseas desinstalar V2Ray? (y/n)\033[0m"
+read -n 1 -r confirmacion
+
+if [ "$confirmacion" = "y" ] || [ "$confirmacion" = "Y" ]; then
+    echo -e "\nDesinstalando V2Ray..."
+    
     sudo systemctl stop v2ray
 
-    # Eliminar el servicio V2Ray
+    
     sudo systemctl disable v2ray
     sudo rm -f /etc/systemd/system/v2ray.service
 
-    # Eliminar los archivos de configuración y ejecutables de V2Ray
+    
     sudo rm -rf /usr/bin/v2ray /etc/v2ray
 
-    # Puedes agregar más acciones de limpieza aquí según tus necesidades
+    
 
     echo -e "\033[32mV2Ray se ha desinstalado correctamente.\033[0m"
+    echo -e "Presiona Enter para salir..."
+    read -s -n 1
+else
+    echo -e "\nOperación de desinstalación cancelada. Volviendo al menú principal..."
+    echo -e "Presiona Enter para salir..."
+    read -s -n 1
+fi
                         ;;
                     3) 
                         configurar_temporizador
@@ -727,7 +747,7 @@ while true; do
                         ;;
                     5)
                         echo "Volviendo al menú principal..."
-                        break  # Salir del bucle while
+                        break  
                         ;;
                     *)
                         echo -e "${RED}Opción no válida${NC}"
