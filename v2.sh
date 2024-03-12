@@ -320,7 +320,7 @@ show_backups() {
 }
 
 
-}
+
 show_registered_user() {
     clear
     print_message "${CYAN}" "Información de Usuarios:"
