@@ -319,41 +319,7 @@ show_backups() {
     done
 }
 
-show_vmess_by_uuid() {
-    clear
-    show_registered_users
-    read -p "Ingrese el UUID del usuario para ver la información de vmess (presiona Enter para volver al menú principal): " userUuid
 
-    if [ -z "$userUuid" ]; then
-        print_message "${YELLOW}" "Volviendo al menú principal."
-        return
-    fi
-
-    user_info=$(grep "$userUuid" $USERS_FILE)
-
-    if [ -z "$user_info" ]; then
-        print_message "${RED}" "UUID no encontrado. Volviendo al menú principal."
-        return
-    fi
-
-    
-    user_name=$(echo $user_info | awk -F'|' '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')  # Eliminar espacios en blanco al inicio y al final
-    expiration_date=$(echo $user_info | awk -F'|' '{print $4}' | sed 's/^[ \t]*//;s/[ \t]*$//' | date +"%Y-%m-%d" -f -)  # Formatear la fecha a yyyy-mm-dd
-
-    
-    print_message "${CYAN}" "Información de vmess del usuario con UUID $userUuid:"
-    echo "=========================="
-    echo "Group: A"
-    echo "IP: 186.148.224.202"
-    echo "Port: 80"
-    echo "TLS: close"
-    echo "Email: $user_name"
-    echo "UUID: $userUuid"
-    echo "Alter ID: 0"
-    echo "Network: WebSocket host: ssh-fastly.panda1.store, path: privadoAR"
-    echo "TcpFastOpen: open"
-    echo "Fecha de Expiración: $expiration_date"
-    echo "=========================="
 }
 show_registered_user() {
     clear
@@ -444,40 +410,7 @@ return
 
 show_vmess_by_uuid() {
     show_registered_user
-    read -p "Ingrese el UUID del usuario para ver la información de vmess (presiona Enter para volver al menú principal): " userUuid
-
-    if [ -z "$userUuid" ]; then
-    print_message "${YELLOW}" "Volviendo al menú principal."
-    read -p "Presione Enter para continuar"
-    return
-fi
-
-    user_info=$(grep "$userUuid" $USERS_FILE)
-
-    if [ -z "$user_info" ]; then
-        print_message "${RED}" "UUID no encontrado. Volviendo al menú principal."
-        read -p "Presione Enter para continuar"
-        return
-    fi
-
-    
-    user_name=$(echo $user_info | awk -F'|' '{print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')  
-expiration_date=$(echo $user_info | awk -F'|' '{print $4}' | sed 's/^[ \t]*//;s/[ \t]*$//')  
-
-print_message "${CYAN}" "Información de vmess del usuario con UUID $userUuid:"
-echo "=========================="
-echo "Group: A"
-echo "IP: 186.148.224.202"
-echo "Port: 80"
-echo "TLS: close"
-echo "Email: $user_name"
-echo "UUID: $userUuid"
-echo "Alter ID: 0"
-echo "Network: WebSocket host: ssh-fastly.panda1.store, path: privadoAR"
-echo "TcpFastOpen: open"
-echo "Fecha de Expiración: $expiration_date"
-echo "=========================="
-
+print_message "${RED}" "próximamente"
 read -p "Presione Enter para continuar"
 }
 
