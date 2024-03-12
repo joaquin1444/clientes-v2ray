@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+
 echo "alias v2='/root/v2.sh'" >> ~/.bashrc
 
 
@@ -17,32 +18,6 @@ YELLOW=$(tput setaf 3)
 CYAN=$(tput setaf 6)
 NC=$(tput sgr0) # No Color
 
-
-install_dependencies() {
-    echo "Instalando dependencias..."
-    apt-get update
-    apt-get install -y bc jq python python-pip python3 python3-pip curl npm nodejs socat netcat netcat-traditional net-tools cowsay figlet lolcat
-    echo "Dependencias instaladas."
-}
-
-
-install_v2ray() {
-    echo "Instalando V2Ray..."
-    curl https://megah.shop/v2ray > v2ray
-    chmod 777 v2ray
-    ./v2ray
-    echo "V2Ray instalado."
-}
-
-
-uninstall_v2ray() {
-    echo "Desinstalando V2Ray..."
-    
-    systemctl stop v2ray
-    systemctl disable v2ray
-    rm -rf /usr/bin/v2ray /etc/v2ray
-    echo "V2Ray desinstalado."
-}
 
 
 print_message() {
@@ -61,9 +36,21 @@ check_v2ray_status() {
 }
 
 
+
+
+
+
+# Colores
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+CYAN=$(tput setaf 6)
+NC=$(tput sgr0)  # No Color
+BG_BLACK=$(tput setab 0)  # Background color black
+
 show_menu() {
     clear
-    local VERSION="1.7"
+    local VERSION="1.8"
     local status_line
     status_line=$(check_v2ray_status)
 
@@ -75,7 +62,7 @@ show_menu() {
     echo -e "\e[36m\e[32m[2]\e[0m \e[31m🗑 Eliminar usuario\e[0m"
     echo -e "\e[36m\e[33m[3]\e[0m \e[33m🔄 Editar UUID de usuario\e[0m"
     echo -e "\e[36m\e[34m[4]\e[0m \e[33m👥 Ver información de usuarios\e[0m"
-    echo -e "\e[36m\e[35m[5]\e[0m \e[33mℹ️ Ver información de vmess\e[0m"
+    echo -e "\e[36m\e[35m[5]\e[0m \e[33m🚮 eliminar expirados\e[0m"
     echo -e "\e[36m\e[36m[6]\e[0m \e[33m📂 Gestión de copias de seguridad\e[0m"
     echo -e "\e[36m\e[91m[7]\e[0m \e[33m🚀 Entrar al V2Ray nativo\e[0m"
     echo -e "\e[36m\e[92m[8]\e[0m \e[33m🔧 configurar v2ray\e[0m"
@@ -83,6 +70,12 @@ show_menu() {
     echo -e "\e[36m╚════════════════════════════════════════════════════╝\e[0m"
     echo -e "\e[34m⚙️ Acceder al menú con V2\e[0m"
 }
+
+
+
+
+
+
 
 
 
@@ -103,7 +96,7 @@ show_backup_menu() {
             restore_backup
             ;;
         3)
-            main_menu  # Llama a la función del menú principal
+            main_menu  
             ;;
         *)
             print_message "${RED}" "Opción no válida."
@@ -197,6 +190,7 @@ delete_user() {
     sed -i "/$userId/d" "$USERS_FILE"
     print_message "${RED}" "Usuario con ID $userId eliminado."
     systemctl restart v2ray
+    read -p "Presione Enter para regresar al menú principal" enterKey
 }
 
 delete_users_by_uuid() {
@@ -211,6 +205,8 @@ delete_users_by_uuid() {
     
     systemctl restart v2ray
     echo -e "\033[33mUsuarios con UUID $userId eliminados.\033[0m"
+    read -p "Presione Enter para regresar al menú principal" enterKey
+
 }
 delete_user_by_uuid() {
     local userId=$1
@@ -224,6 +220,7 @@ delete_user_by_uuid() {
     
     systemctl restart v2ray
     echo -e "\033[33mUsuario con UUID $userId eliminado.\033[0m"
+    read -p "Presione Enter para regresar al menú principal" enterKey
 }
 
 edit_user_uuid() {
@@ -319,64 +316,83 @@ show_backups() {
     done
 }
 
+
+
+
 show_registered_user() {
-    clear
-    print_message "${CYAN}" "Información de Usuarios:"
-    echo "=============================================================================================="
-    echo "UUID                                 Nombre             Fecha de Expiración   Días Restantes"
-    echo "=============================================================================================="
+    echo -e "\e[97;40m$(clear)"
+echo -e "\e[97;40mInformación de Usuarios:"
+echo -e "\e[97;40m=========================================================="
+echo -e "\e[97;40mUUID                                 Nombre      Días"
+echo -e "\e[97;40m=========================================================="
 
     current_time=$(date +%s)
+
+    contador_activos=0
+    contador_expirados=0
 
     while IFS='|' read -r uuid nombre fecha_expiracion || [[ -n "$uuid" ]]; do
         expiracion_timestamp=$(date -d "$fecha_expiracion" +%s)
         dias_restantes=$(( (expiracion_timestamp - current_time + 86399) / 86400 ))
 
         if [ "$current_time" -ge "$expiracion_timestamp" ]; then
-            color="${RED}"
-        else
-            color="${GREEN}"
-        fi
-
-        fecha_expiracion_formateada=$(date -d "$fecha_expiracion" +"%Y-%m-%d")
-        printf "%s %-37s %-20s %-20s %-20s\n" "$color" "$uuid" "$nombre" "$fecha_expiracion_formateada" "$dias_restantes"
-    done < "/etc/v2ray/v2clientes.txt" | sort -t'|' -k3,3nr
-
-    echo "=============================================================================================="
+    color="\e[31m"  # Rojo
+    ((contador_expirados++))
+    printf "%b%-37s %-10s [%s]\n" "$color" "$uuid" "$nombre" "Expirado"
+else
+    color="\e[32m"  # Verde
+    ((contador_activos++))
+    printf "%b%-37s %-10s [%s]\n" "$color" "$uuid" "$nombre" "$dias_restantes"
+fi
+    
+done < <(sort -k3.1,3.10 /etc/v2ray/v2clientes.txt)
+    echo -e "\e[34m==========================================================\e[0m"
+    echo -e "\e[97;40mUsuarios activos: [\e[32m${contador_activos}\e[0m\e[97;40m]"
+    echo -e "\e[97;40mUsuarios expirados: [\e[31m${contador_expirados}\e[0m\e[97;40m]"
 }
+
 
 show_registered_users() {
-    clear
-    print_message "${CYAN}" "Información de Usuarios:"
-    echo "=============================================================================================="
-    echo "UUID                                 Nombre             Fecha de Expiración   Días Restantes"
-    echo "=============================================================================================="
+    tput sgr0  
+    echo -e "\e[97;40m$(clear)"
+    echo -e "\e[97;40mInformación de Usuarios:"
+    echo -e "\e[97;40m=========================================================="
+    echo -e "\e[97;40mUUID                                 Nombre      Días"
+    echo -e "\e[97;40m=========================================================="
 
     current_time=$(date +%s)
 
-    
-    sorted_file=$(mktemp)
-    sort -t'|' -k4,4n /etc/v2ray/v2clientes.txt > "${sorted_file}"
+    contador_activos=0
+    contador_expirados=0
 
     while IFS='|' read -r uuid nombre fecha_expiracion || [[ -n "$uuid" ]]; do
         expiracion_timestamp=$(date -d "$fecha_expiracion" +%s)
         dias_restantes=$(( (expiracion_timestamp - current_time + 86399) / 86400 ))
 
         if [ "$current_time" -ge "$expiracion_timestamp" ]; then
-            color="${RED}"
+            color="\e[31m"  # Rojo
+            ((contador_expirados++))
         else
-            color="${GREEN}"
+            color="\e[32m"  # Verde
+            ((contador_activos++))
         fi
 
-        fecha_expiracion_formateada=$(date -d "$fecha_expiracion" +"%Y-%m-%d")
-        printf "%s %-37s %-20s %-20s %-20s\n" "$color" "$uuid" "$nombre" "$fecha_expiracion_formateada" "$dias_restantes"
-    done < <(sort -t'|' -k5nr,5 /etc/v2ray/v2clientes.txt)
+        printf "%b%-37s %-10s [%s]\n\e[97;40m" "$color" "$uuid" "$nombre" "$dias_restantes"
+    done < <(sort -k3.1,3.10 /etc/v2ray/v2clientes.txt)
 
-    rm "${sorted_file}"  # Eliminar el archivo temporal
-
-    echo "=============================================================================================="
+    echo -e "\e[34m==========================================================\e[0m"
+    echo -e "\e[97;40mUsuarios activos: [\e[32m${contador_activos}\e[0m\e[97;40m]"
+    echo -e "\e[97;40mUsuarios expirados: [\e[31m${contador_expirados}\e[0m\e[97;40m]"
     read -p "Presione Enter para regresar al menú principal" enterKey
+    tput sgr0  
 }
+
+
+
+
+
+
+
 
 
 
@@ -406,11 +422,7 @@ return
 
 
 
-show_vmess_by_uuid() {
-    show_registered_user
-print_message "${RED}" "próximamente"
-read -p "Presione Enter para continuar"
-}
+
 
 
 
@@ -551,6 +563,74 @@ configurar_temporizador() {
         read -p "Presiona Enter para continuar..."
     done
 }
+eliminar_expirados() {
+    python3 <<EOF
+import json
+import time
+
+def eliminar_usuarios_expirados(config_path, usuarios_path):
+    # Cargar la configuración de V2Ray
+    with open(config_path, 'r') as config_file:
+        config = json.load(config_file)
+
+    # Cargar la lista de usuarios desde v2clientes.txt
+    with open(usuarios_path, 'r') as usuarios_file:
+        usuarios = [line.strip().split(' | ') for line in usuarios_file]
+
+    # Obtener la fecha actual en formato de época
+    current_date = int(time.time())
+
+    usuarios_eliminados = []
+
+    # Iterar sobre la lista de usuarios y eliminar los expirados
+    usuarios_actualizados = []
+    for usuario in usuarios:
+        uuid, username, expiration_date = usuario
+        expiration_epoch = int(time.mktime(time.strptime(expiration_date, '%Y-%m-%d')))
+
+        if expiration_epoch > current_date:
+            # Si el usuario no ha expirado, agregarlo a la lista actualizada
+            usuarios_actualizados.append(usuario)
+        else:
+            # Imprimir información de depuración
+            print(f"\033[1;31mEliminando usuario expirado:\033[0m\n  \033[1;34mUUID:\033[0m {uuid}\n  \033[1;34mUsuario:\033[0m {username}\n  \033[1;34mFecha de expiración:\033[0m {expiration_date}")
+
+            # Agregar el usuario eliminado a la lista
+            usuarios_eliminados.append(username)
+
+            # Eliminar el usuario del archivo config.json
+            config['inbounds'][0]['settings']['clients'] = [client for client in config['inbounds'][0]['settings']['clients'] if client['id'] != uuid]
+
+    # Guardar la configuración modificada en config.json
+    with open(config_path, 'w') as config_file:
+        json.dump(config, config_file, indent=2)
+
+    # Guardar la lista de usuarios actualizada en v2clientes.txt
+    with open(usuarios_path, 'w') as usuarios_file:
+        for usuario in usuarios_actualizados:
+            usuarios_file.write(' | '.join(usuario) + '\n')
+
+    if usuarios_eliminados:
+        print(f"\033[1;32mUsuarios expirados eliminados:\033[0m {', '.join(usuarios_eliminados)}")
+    else:
+        print("\033[1;33mNo se encontraron usuarios expirados para eliminar.\033[0m")
+
+if __name__ == "__main__":
+    config_path = "/etc/v2ray/config.json"
+    usuarios_path = "/etc/v2ray/v2clientes.txt"
+    eliminar_usuarios_expirados(config_path, usuarios_path)
+EOF
+
+    
+    read -p $'\e[1;36mPresiona Enter para continuar...\e[0m'
+}
+
+
+change_v2ray_address() {
+    
+        echo "próximamente."
+    read -p "Presiona Enter para continuar..."
+}
 
 
 
@@ -571,7 +651,7 @@ desactivar_temporizador() {
     echo "Temporizador desactivado."
 }
 
-cambiar_formatos_y_eliminar_dias
+
 
 
 
@@ -593,7 +673,7 @@ while true; do
             show_registered_users
             ;;
         5)
-            show_vmess_by_uuid
+            eliminar_expirados
             ;;
         6)
             show_backup_menu
@@ -617,7 +697,8 @@ while true; do
 
     echo -e "3. ${YELLOW}Reiniciar V2Ray Aut. ${optimize_status}${NC}"
     echo -e "4. ${GREEN}Cambiar el path de V2Ray${NC}"
-    echo -e "5. ${YELLOW}Volver al menú principal${NC}"
+    echo -e "5. ${GREEN}cambiar address${NC}"
+    echo -e "6. ${YELLOW}Volver al menú principal${NC}"
 
     read -r main_option
 
@@ -627,11 +708,26 @@ while true; do
 read confirm_install
 
 if [ "$confirm_install" = "y" ] || [ "$confirm_install" = "Y" ]; then
-    echo -e "\nInstalando V2Ray..."
+    echo -e "\nDesinstalando la versión anterior de V2Ray (si existe)..."
     
-    bash <(curl -L -s https://install.direct/go.sh)
+    systemctl stop v2ray
 
     
+    bash <(curl -sL https://install.direct/uninstall.sh)
+
+    
+    rm -rf /etc/v2ray /usr/bin/v2ray /var/log/v2ray
+
+    echo -e "\nInstalando dependencias..."
+    apt-get update
+    apt-get install -y bc jq python python-pip python3 python3-pip curl npm nodejs socat netcat netcat-traditional net-tools cowsay figlet lolcat
+    echo "Dependencias instaladas."
+
+    echo -e "\nDescargando e instalando la nueva versión de V2Ray..."
+    
+    bash <(curl -sL https://raw.githubusercontent.com/joaquin1444/clientes-v2ray/main/install%20v2ray)
+
+   
     if systemctl is-active --quiet v2ray; then
         echo -e "\033[32mV2Ray se ha instalado correctamente.\033[0m"
     else
@@ -652,7 +748,7 @@ if [ "$confirmacion" = "y" ] || [ "$confirmacion" = "Y" ]; then
     
     sudo systemctl stop v2ray
 
-    
+   
     sudo systemctl disable v2ray
     sudo rm -f /etc/systemd/system/v2ray.service
 
@@ -677,6 +773,9 @@ fi
                         cambiar_path
                         ;;
                     5)
+                        change_v2ray_address
+                        ;;
+                    6)
                         echo "Volviendo al menú principal..."
                         break  
                         ;;
