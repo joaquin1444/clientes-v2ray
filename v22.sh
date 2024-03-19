@@ -4,7 +4,7 @@
 
 
 
-echo "alias v2='/root/v2.sh'" >> ~/.bashrc
+echo "alias v22='/usr/bin/v22.sh'" >> ~/.bashrc
 source ~/.bashrc
 CONFIG_FILE="/etc/v2ray/config.json"
 USERS_FILE="/etc/v2ray/v2clientes.txt"
