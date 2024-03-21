@@ -46,7 +46,7 @@ show_menu() {
     echo -e "\e[36m\e[32m[2]\e[0m \e[31m🗑 Eliminar usuario \e[0m"
     echo -e "\e[36m\e[33m[3]\e[0m \e[33m🔄 Editar UUID de usuario \e[0m"
     echo -e "\e[36m\e[34m[4]\e[0m \e[33m👥 Ver información de usuarios \e[0m"
-    echo -e "\e[36m\e[35m[5]\e[0m \e[33m🚮 ver vmess \e[0m"
+    echo -e "\e[36m\e[35m[5]\e[0m \e[33m🔍 ver vmess \e[0m"
     echo -e "\e[36m\e[35m[6]\e[0m \e[33m🚮 eliminar expirados \e[0m"
     echo -e "\e[36m\e[35m[7]\e[0m \e[33m🟢 ver conectados \e[0m"
     echo -e "\e[36m\e[36m[8]\e[0m \e[33m📂 Gestión de copias de seguridad \e[0m"
