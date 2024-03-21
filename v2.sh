@@ -1201,7 +1201,7 @@ fi
                 esac
             done 
                 ;;
-            10)
+            11)
                 echo "Saliendo..."
                 exit 0  
                 ;;
