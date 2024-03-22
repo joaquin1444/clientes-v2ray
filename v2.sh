@@ -42,17 +42,17 @@ show_menu() {
     
     menu_info  
     echo -e "\e[36m╚════════════════════════════════════════════════════╝\e[0m"
-    echo -e "\e[36m\e[31m[1]\e[0m \e[32m➕ Agregar nuevo usuario \e[0m"
-    echo -e "\e[36m\e[32m[2]\e[0m \e[31m🗑 Eliminar usuario \e[0m"
-    echo -e "\e[36m\e[33m[3]\e[0m \e[33m🔄 Editar UUID de usuario \e[0m"
-    echo -e "\e[36m\e[34m[4]\e[0m \e[33m👥 Ver información de usuarios \e[0m"
-    echo -e "\e[36m\e[35m[5]\e[0m \e[33m🔍 ver vmess \e[0m"
-    echo -e "\e[36m\e[35m[6]\e[0m \e[33m🚮 eliminar expirados \e[0m"
-    echo -e "\e[36m\e[35m[7]\e[0m \e[33m🟢 ver conectados \e[0m"
-    echo -e "\e[36m\e[36m[8]\e[0m \e[33m📂 Gestión de copias de seguridad \e[0m"
-    echo -e "\e[36m\e[91m[9]\e[0m \e[33m🚀 Entrar al V2Ray nativo \e[0m"
-    echo -e "\e[36m\e[92m[10]\e[0m \e[33m🔧 configurar v2ray \e[0m"
-    echo -e "\e[36m\e[93m[11]\e[0m \e[33m🚪 Salir \e[0m"
+    echo -e "\e[36m\e[31m[1]\e[0m \e[32m➕ AGREGAR NUEVO USUARIO \e[0m"
+    echo -e "\e[36m\e[32m[2]\e[0m \e[31m🗑 ELIMINAR USUARIO \e[0m"
+    echo -e "\e[36m\e[33m[3]\e[0m \e[33m🔄 EDITAR UUID DE USUARIO \e[0m"
+    echo -e "\e[36m\e[34m[4]\e[0m \e[33m👥 VER INFORMACIÓN DE USUARIOS \e[0m"
+    echo -e "\e[36m\e[35m[5]\e[0m \e[33m🔍 VER VMESS \e[0m"
+    echo -e "\e[36m\e[35m[6]\e[0m \e[33m🚮 ELIMINAR EXPIRADOS \e[0m"
+    echo -e "\e[36m\e[35m[7]\e[0m \e[33m🟢 VER CONECTADOS \e[0m"
+    echo -e "\e[36m\e[36m[8]\e[0m \e[33m📂 GESTIÓN DE COPIAS DE SEGURIDAD \e[0m"
+    echo -e "\e[36m\e[91m[9]\e[0m \e[33m🚀 ENTRAR AL V2RAY NATIVO \e[0m"
+    echo -e "\e[36m\e[92m[10]\e[0m \e[33m🔧 CONFIGURAR V2RAY \e[0m"
+    echo -e "\e[36m\e[93m[11]\e[0m \e[33m🚪 SALIR \e[0m"
     echo -e "\e[36m╚════════════════════════════════════════════════════╝\e[0m"
     echo -e "\e[34m⚙️ Acceder al menú con V2 \e[0m"
 }
@@ -127,39 +127,39 @@ show_backup_menu() {
 add_user() {
     clear
     print_separator
-    print_message "${CYAN}" "Agregar Nuevo Usuario"
+    print_message "${CYAN}" "AGREGAR NUEVO USUARIO"
 
-    read -p "$(echo -e "${YELLOW}Ingrese el nombre del nuevo usuario:${NC} ")" userName
+    read -p "$(echo -e "${YELLOW}INGRESE EL NOMBRE DEL NUEVO USUARIO:${NC} ")" userName
     if grep -q "| $userName |" "$USERS_FILE"; then
-        print_message "${RED}" "Ya existe un usuario con el mismo nombre. Por favor, elija otro nombre."
-        read -p "Presione Enter para regresar al menú principal" enterKey
+        print_message "${RED}" "YA EXISTE UN USUARIO CON EL MISMO NOMBRE. POR FAVOR, ELIJA OTRO NOMBRE."
+        read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
         clear
         return 1
     fi
     print_separator
-    read -p "$(echo -e "${YELLOW}Ingrese la duración en días para el nuevo usuario:${NC} ")" days
+    read -p "$(echo -e "${YELLOW}INGRESE LA DURACIÓN EN DÍAS PARA EL NUEVO USUARIO:${NC} ")" days
 
     if ! [[ "$days" =~ ^[0-9]+$ ]]; then
-        print_message "${RED}" "La duración debe ser un número."
-        read -p "Presione Enter para regresar al menú principal" enterKey
+        print_message "${RED}" "LA DURACIÓN DEBE SER UN NÚMERO."
+        read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
         clear
         return 1
     fi
     print_separator
-    read -p "$(echo -e "${YELLOW}¿Desea ingresar un UUID personalizado? (Sí: S, No: cualquier tecla):${NC} ")" customUuidChoice
+    read -p "$(echo -e "${YELLOW}¿DESEA INGRESAR UN UUID PERSONALIZADO? (SÍ: S, NO: CUALQUIER TECLA):${NC} ")" customUuidChoice
 
     if [[ "${customUuidChoice,,}" == "s" ]]; then
-        read -p "$(echo -e "${YELLOW}Ingrese el UUID personalizado para el nuevo usuario (Formato: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX):${NC} ")" userId
+        read -p "$(echo -e "${YELLOW}INGRESE EL UUID PERSONALIZADO PARA EL NUEVO USUARIO (FORMATO: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX):${NC} ")" userId
 
         if ! [[ "$userId" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
-            print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-            read -p "Presione Enter para regresar al menú principal" enterKey
+            print_message "${RED}" "FORMATO DE UUID NO VÁLIDO. DEBE SER XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+            read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
             clear
             return 1
         fi
 
         if grep -q "$userId" "$USERS_FILE"; then
-            print_message "${RED}" "Advertencia: Ya existe un usuario con el mismo UUID. Eliminando el usuario existente..."
+            print_message "${RED}" "ADVERTENCIA: YA EXISTE UN USUARIO CON EL MISMO UUID. ELIMINANDO EL USUARIO EXISTENTE..."
             delete_user_by_uuid "$userId"
         fi
     else
@@ -168,8 +168,8 @@ add_user() {
     alterId=0
     expiration_date=$(date -d "+$days days" +%Y-%m-%d)
     print_separator
-    print_message "${CYAN}" "UUID del nuevo usuario: ${GREEN}$userId${NC}"
-    print_message "${YELLOW}" "Fecha de expiración: ${GREEN}$expiration_date${NC}"
+    print_message "${CYAN}" "UUID DEL NUEVO USUARIO: ${GREEN}$userId${NC}"
+    print_message "${YELLOW}" "FECHA DE EXPIRACIÓN: ${GREEN}$expiration_date${NC}"
 
     userJson="{\"alterId\": $alterId, \"id\": \"$userId\", \"email\": \"$userName\", \"expiration\": $(date -d "$expiration_date" +%s)}"
 
@@ -179,10 +179,10 @@ add_user() {
     echo "$userId | $userName | $expiration_date" >> "$USERS_FILE"
 
     systemctl restart v2ray
-    print_message "${GREEN}" "Usuario agregado exitosamente."
+    print_message "${GREEN}" "USUARIO AGREGADO EXITOSAMENTE."
     print_separator
     
-    print_message "${CYAN}" "vmess del nuevo usuario:"
+    print_message "${CYAN}" "VMESS DEL NUEVO USUARIO:"
     ps="$userName"
     id="$userId"
     aid="$alterId"
@@ -192,21 +192,24 @@ add_user() {
     path=$(jq -r '.inbounds[0].streamSettings.wsSettings.path // empty' "$CONFIG_FILE")
     host=$(jq -r '.inbounds[0].streamSettings.wsSettings.headers.Host // empty' "$CONFIG_FILE")
 
-    # Verificar si el transporte de TLS está activo
+    
     tls_active=$(jq '.inbounds[0].streamSettings | has("security")' "$CONFIG_FILE")
     if [[ "$tls_active" == "true" ]]; then
-        tls="tls"
+        tls="open"
     else
-        tls=""
+        tls="close"
     fi
 
     var="{\"v\":\"2\",\"ps\":\"$ps\",\"add\":\"$add\",\"port\":$port,\"aid\":$aid,\"type\":\"none\",\"net\":\"$net\",\"path\":\"$path\",\"host\":\"$host\",\"id\":\"$id\",\"tls\":\"$tls\"}"
     print_message "${GREEN}" "vmess://$(echo "$var" | jq -r '.|@base64')"
 
-    
     print_separator
-    read -p "Presione Enter para regresar al menú principal" enterKey
+    read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
 }
+
+
+
+
 
 
 
@@ -215,21 +218,21 @@ add_user() {
 
 delete_user() {
     clear
-    print_message "${CYAN}" "⚠️ Advertencia: los usuarios expirados se recomienda eliminarlos manualmente con el ID ⚠️ "
+    print_message "${CYAN}" "⚠️ ADVERTENCIA: LOS USUARIOS EXPIRADOS SE RECOMIENDA ELIMINARLOS MANUALMENTE CON EL ID ⚠️ "
     show_registered_user
 
-    read -p "Ingrese el ID del usuario que desea eliminar (o presione Enter para cancelar): " userId
+    read -p "INGRESE EL ID DEL USUARIO QUE DESEA ELIMINAR (O PRESIONE ENTER PARA CANCELAR): " userId
 
     if [ -z "$userId" ]; then
-        print_message "${YELLOW}" "No se seleccionó ningún ID. Volviendo al menú principal."
+        print_message "${YELLOW}" "NO SE SELECCIONÓ NINGÚN ID. VOLVIENDO AL MENÚ PRINCIPAL."
         return
     fi
 
     jq ".inbounds[0].settings.clients = (.inbounds[0].settings.clients | map(select(.id != \"$userId\")))" "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
     sed -i "/$userId/d" "$USERS_FILE"
-    print_message "${RED}" "Usuario con ID $userId eliminado."
+    print_message "${RED}" "USUARIO CON ID $userId ELIMINADO."
     systemctl restart v2ray
-    read -p "Presione Enter para regresar al menú principal" enterKey
+    read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
 }
 delete_users_by_uuid() {
     local userId=$1
@@ -242,8 +245,8 @@ delete_users_by_uuid() {
 
     
     systemctl restart v2ray
-    echo -e "\033[33mUsuarios con UUID $userId eliminados.\033[0m"
-    read -p "Presione Enter para regresar al menú principal" enterKey
+    echo -e "\033[33mUSUARIOS CON UUID $userId ELIMINADOS.\033[0m"
+    read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
 
 }
 delete_user_by_uuid() {
@@ -257,16 +260,16 @@ delete_user_by_uuid() {
 
     
     systemctl restart v2ray
-    echo -e "\033[33mUsuario con UUID $userId eliminado.\033[0m"
-    read -p "Presione Enter para regresar al menú principal" enterKey
+    echo -e "\033[33mUSUARIO CON UUID $userId ELIMINADO.\033[0m"
+    read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
 }
 edit_user_uuid() {
     show_registered_user
-    read -p "Ingrese el ID del usuario que desea editar (o presione Enter para cancelar): " userId
+    read -p "INGRESE EL ID DEL USUARIO QUE DESEA EDITAR (O PRESIONE ENTER PARA CANCELAR): " userId
 
     if [ -z "$userId" ]; then
-        print_message "${YELLOW}" "No se seleccionó ningún ID. Volviendo al menú principal."
-        read -p "Presione Enter para regresar al menú principal" enterKey
+        print_message "${YELLOW}" "NO SE SELECCIONÓ NINGÚN ID. VOLVIENDO AL MENÚ PRINCIPAL."
+        read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
         return
     fi
 
@@ -276,18 +279,18 @@ edit_user_uuid() {
     
     sed -i "/$userId/d" "$USERS_FILE"
 
-    read -p "Ingrese el nuevo UUID para el usuario con ID $userId: " newUuid
+    read -p "INGRESE EL NUEVO UUID PARA EL USUARIO CON ID $userId: " newUuid
 
     if [[ ! "$newUuid" =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]]; then
-    print_message "${RED}" "Formato de UUID no válido. Debe ser XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-    read -p "Presione Enter para regresar al menú principal" enterKey
+    print_message "${RED}" "FORMATO DE UUID NO VÁLIDO. DEBE SER XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+    read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
     return
 fi
 
     
     oldName=$(echo "$oldUserData" | awk -F "|" '{print $2}')
 
-    read -p "Ingrese el nuevo nombre para el usuario con ID $userId (o presione Enter para conservar el nombre $oldName): " newName
+    read -p "INGRESE EL NUEVO NOMBRE PARA EL USUARIO CON ID $userId (O PRESIONE ENTER PARA CONSERVAR EL NOMBRE $oldName): " newName
 
 newName=$(echo $newName | xargs)  
 
@@ -295,7 +298,7 @@ if [ -z "$newName" ]; then
     newName=$(echo "$oldName" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 fi
 
-    read -p "Ingrese el número de días para la fecha de expiración (o presione Enter para conservar la fecha del usuario anterior): " expiryDays
+    read -p "INGRESE EL NÚMERO DE DÍAS PARA LA FECHA DE EXPIRACIÓN (O PRESIONE ENTER PARA CONSERVAR LA FECHA DEL USUARIO ANTERIOR): " expiryDays
 
     if [ -z "$expiryDays" ]; then
         oldDate=$(echo "$oldUserData" | awk -F "|" '{print $3}' | xargs)
@@ -317,25 +320,25 @@ fi
     
     systemctl restart v2ray
 
-    print_message "${GREEN}" "UUID del usuario con ID $userId editado exitosamente."
-    read -p "Presione Enter para regresar al menú principal" enterKey
+    print_message "${GREEN}" "UUID DEL USUARIO CON ID $userId EDITADO EXITOSAMENTE."
+    read -p "PRESIONE ENTER PARA REGRESAR AL MENÚ PRINCIPAL" enterKey
 return
 }
 create_backup() {
     clear
     print_separator
-    read -p "Ingrese el nombre del archivo de respaldo: " backupFileName
+    read -p "INGRESE EL NOMBRE DEL ARCHIVO DE RESPALDO: " backupFileName
     backupFilePath="/root/$backupFileName"  
     cp $CONFIG_FILE "$backupFilePath"_config.json
     cp $USERS_FILE "$backupFilePath"_v2clientes.txt
-    print_message "${GREEN}" "Copia de seguridad creada en: $backupFilePath"
+    print_message "${GREEN}" "COPIA DE SEGURIDAD CREADA EN: $backupFilePath"
     print_separator
-    read -p "Presione Enter para continuar"
+    read -p "PRESIONE ENTER PARA CONTINUAR"
 }
 show_backups() {
     print_separator
     clear
-    echo -e "\e[1m\e[34mBackups disponibles:\e[0m"
+    echo -e "\e[1m\e[34mBACKUPS DISPONIBLES:\e[0m"
     
     for backupFile in /root/*_config.json; do
         
@@ -488,7 +491,7 @@ conexion() {
         let n++
     done
     echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e "\033[0mPresione cualquier tecla para continuar..."
+    echo -e "\033[0mPRESIONE CUALQUIER TECLA PARA CONTINUAR..."
     read -n 1 -s -r
     v2ray clean > /dev/null 2>&1
 }
@@ -719,50 +722,50 @@ cambiar_path() {
     printf "\e[1;35mEntrando en la función cambiar_path...\e[0m\n"
 
     while true; do
-        printf "\e[1;33mSelecciona una opción:\e[0m\n"
-        printf "\e[36m1. \e[32mCambiar el nuevo path\e[0m\n"
-        printf "\e[36m2. \e[31mVolver al menú principal\e[0m\n"
-        printf "\e[36mOpción: \e[0m"
+        printf "\e[1;33mSELECCIONA UNA OPCIÓN:\e[0m\n"
+        printf "\e[36m1. \e[32mCAMBIAR EL NUEVO PATH\e[0m\n"
+        printf "\e[36m2. \e[31mVOLVER AL MENÚ PRINCIPAL\e[0m\n"
+        printf "\e[36mOPCIÓN: \e[0m"
         read opcion
 
         case $opcion in
             1)
-                printf "\e[1;32mSeleccionaste cambiar el path...\e[0m\n"
-                printf "\e[36mIntroduce el nuevo path: \e[0m"
+                printf "\e[1;32mSELECCIONASTE CAMBIAR EL PATH...\e[0m\n"
+                printf "\e[36mINTRODUCE EL NUEVO PATH: \e[0m"
                 read nuevo_path
-                printf "\e[1;32mModificando el path a $nuevo_path en el archivo de configuración...\e[0m\n"
+                printf "\e[1;32mMODIFICANDO EL PATH A $nuevo_path EN EL ARCHIVO DE CONFIGURACIÓN...\e[0m\n"
 
                 if ! command -v jq &> /dev/null; then
-                    printf "\e[91mError: 'jq' no está instalado. Instálalo para continuar.\e[0m\n"
+                    printf "\e[91mERROR: 'jq' NO ESTÁ INSTALADO. INSTÁLALO PARA CONTINUAR.\e[0m\n"
                     return
                 fi
 
                 if [ ! -f "$CONFIG_FILE" ]; then
-                    printf "\e[91mError: El archivo de configuración '$CONFIG_FILE' no existe.\e[0m\n"
+                    printf "\e[91mERROR: EL ARCHIVO DE CONFIGURACIÓN '$CONFIG_FILE' NO EXISTE.\e[0m\n"
                     return
                 fi
 
                 jq --arg nuevo_path "$nuevo_path" '.inbounds[0].streamSettings.wsSettings.path = $nuevo_path' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
 
                 if [ $? -eq 0 ]; then
-                    printf "\e[33mEl path ha sido cambiado a $nuevo_path.\e[0m\n"
+                    printf "\e[33mEL PATH HA SIDO CAMBIADO A $nuevo_path.\e[0m\n"
                     systemctl restart v2ray
-                    printf "\e[36mPresiona Enter para regresar al menú principal\e[0m"
+                    printf "\e[36mPRESIONA ENTER PARA REGRESAR AL MENÚ PRINCIPAL\e[0m"
                     read enterKey
                     return
                 else
-                    printf "\e[91mError al modificar el archivo de configuración con jq.\e[0m\n"
-                    printf "\e[36mPresiona Enter para regresar al menú principal\e[0m"
+                    printf "\e[91mERROR AL MODIFICAR EL ARCHIVO DE CONFIGURACIÓN CON jq.\e[0m\n"
+                    printf "\e[36mPRESIONA ENTER PARA REGRESAR AL MENÚ PRINCIPAL\e[0m"
                     read enterKey
                     return
                 fi
                 ;;
             2)
-                printf "\e[1;31mSeleccionaste volver al menú principal...\e[0m\n"
+                printf "\e[1;31mSELECCIONASTE VOLVER AL MENÚ PRINCIPAL...\e[0m\n"
                 return
                 ;;
             *)
-                printf "\e[91mOpción inválida. Por favor, selecciona una opción válida.\e[0m\n"
+                printf "\e[91mOPCIÓN INVÁLIDA. POR FAVOR, SELECCIONA UNA OPCIÓN VÁLIDA.\e[0m\n"
                 ;;
         esac
     done
@@ -810,12 +813,18 @@ configurar_temporizador() {
         read -p "Presiona Enter para continuar..."
     done
 }
+
+
 eliminar_expirados() {
     python3 <<EOF
 import json
 import time
 
 def eliminar_usuarios_expirados(config_path, usuarios_path):
+    # Definir función para imprimir un separador
+    def print_separator():
+        print("\033[1;34m============================================================\033[0m")
+
     # Cargar la configuración de V2Ray
     with open(config_path, 'r') as config_file:
         config = json.load(config_file)
@@ -840,6 +849,7 @@ def eliminar_usuarios_expirados(config_path, usuarios_path):
             usuarios_actualizados.append(usuario)
         else:
             # Imprimir información de depuración
+            print_separator()
             print(f"\033[1;31mEliminando usuario expirado:\033[0m\n  \033[1;34mUUID:\033[0m {uuid}\n  \033[1;34mUsuario:\033[0m {username}\n  \033[1;34mFecha de expiración:\033[0m {expiration_date}")
 
             # Agregar el usuario eliminado a la lista
@@ -868,12 +878,20 @@ if __name__ == "__main__":
     eliminar_usuarios_expirados(config_path, usuarios_path)
 EOF
 
-    print_separator
+    # Definir la función print_separator
+    print_separator() {
+        echo -e "\e[1;34m============================================================\e[0m"
+    }
+
+    # Esperar a que el usuario presione Enter para continuar
     read -p $'\e[1;36mPresiona Enter para continuar...\e[0m'
 }
+
+
 print_separator() {
     echo -e "\e[1;34m============================================================\e[0m"
 }
+
 addres_ip() {
     config="/etc/v2ray/config.json"
     temp="/tmp/temp_v2ray_config.json"
@@ -882,11 +900,11 @@ addres_ip() {
     _add=""
 
     print_separator
-    echo -e "\e[1;33mCONFIG address V2RAY\e[0m"
+    echo -e "\e[1;33mCONFIGURACIÓN DE ADDRES V2RAY\e[0m"
     print_separator
 
     while [[ -z $_add || $_add == '' ]]; do
-        echo -e "\e[1;34mNuevo address\e[0m"
+        echo -e "\e[1;34mNueva ADDRES\e[0m"
         read -p "Ingrese la nuevo addres (presione Enter para cancelar): " _add
         if [[ -z "$_add" ]]; then
             echo -e "\e[1;31mCancelado.\e[0m"
@@ -938,16 +956,16 @@ echo -e "${GREEN}REFRESCANDO CACHE Y RAM ${NC}"
   rm /tmp/* &>/dev/null
   touch /tmp/abc
   sleep 0.5s
-  echo -e "${DE}Cache/Ram limpiada con Exito!"
+  echo -e "${DE}CACHE/RAM LIMPIADA CON ÉXITO!"
 
   if [[ ! -z $(crontab -l|grep -w "vm.drop_caches=3") ]]; then
     while :
     do
-    echo -ne "${VE} Quitar tarea programada [S/N]: " && read t_ram
+    echo -ne "${VE} QUITAR TAREA PROGRAMADA [S/N]: " && read t_ram
     tput cuu1 && tput dl1
     case $t_ram in
       s|S) crontab -l > /root/cron && sed -i '/vm.drop_caches=3/ d' /root/cron && crontab /root/cron && rm /root/cron
-           echo -e "${VE} Tarea automatica removida!" && sleep 2
+           echo -e "${VE} TAREA AUTOMÁTICA REMOVIDA!" && sleep 2
            return 1;;
       n|N)return 1;;
       *)echo -e "${VE} Selecciona S para si, N para no" && sleep 2 && tput cuu1 && tput dl1;;
@@ -955,11 +973,11 @@ echo -e "${GREEN}REFRESCANDO CACHE Y RAM ${NC}"
     done
   fi 
 
-  echo -ne "${VE}Desea programar una tarea automatica [s/n]: "
+  echo -ne "${VE}DESEA PROGRAMAR UNA TAREA AUTOMÁTICA [S/N]: "
   read c_ram
   if [[ $c_ram = @(s|S|y|Y) ]]; then
     tput cuu1 && tput dl1
-    echo -ne "${VE} PERIODO DE EJECUCION DE LA TAREA [1-12HS]: "
+    echo -ne "${VE} PERIODO DE EJECUCIÓN DE LA TAREA [1-12HS]: "
     read ram_c
     if [[ $ram_c =~ $numero ]]; then
       crontab -l > /root/cron
@@ -968,10 +986,10 @@ echo -e "${GREEN}REFRESCANDO CACHE Y RAM ${NC}"
       crontab /root/cron
       rm /root/cron
       tput cuu1 && tput dl1
-      echo -e "${VE} Tarea automatica programada cada: ${DE}${ram_c}HS" && sleep 2
+      echo -e "${VE} TAREA AUTOMÁTICA PROGRAMADA CADA: ${DE}${ram_c}HS" && sleep 2
     else
       tput cuu1 && tput dl1
-      echo -e "${MA} ingresar solo numeros entre 1 y 12"
+      echo -e "${MA} INGRESE SOLO NÚMEROS ENTRE 1 Y 12"
       sleep 2
     fi
   fi
@@ -985,33 +1003,33 @@ echo -e "${GREEN}REFRESCANDO CACHE Y RAM ${NC}"
 
 
 protocolv2ray () {
-    echo -e "\e[1mEscojer opción 3 y poner el dominio de nuestra IP:\e[0m"
+    echo -e "\e[1mESCOGER OPCIÓN 3 Y PONER EL DOMINIO DE NUESTRA IP:\e[0m"
     print_separator
     v2ray stream
     print_separator
-    echo -e "\e[1mEnter Para Continuar\e[0m" && read enter
+    echo -e "\e[1mENTER PARA CONTINUAR\e[0m" && read enter
     ${SCPinst}/v2ray.sh
 }
 tls () {
-    echo -e "\e[1mActivar o Desactivar TLS:\e[0m"
+    echo -e "\e[1mACTIVAR O DESACTIVAR TLS:\e[0m"
     print_separator
     v2ray tls
     print_separator
-    echo -e "\e[1mEnter Para Continuar\e[0m" && read enter
+    echo -e "\e[1mENTER PARA CONTINUAR\e[0m" && read enter
     ${SCPinst}/v2ray.sh
 }
 portv () {
-    echo -e "\e[1mCambiar Puerto v2ray:\e[0m"
+    echo -e "\e[1mCAMBIAR PUERTO V2RAY:\e[0m"
     print_separator
     v2ray port
     print_separator
-    echo -e "\e[1mEnter Para Continuar\e[0m" && read enter
+    echo -e "\e[1mENTER PARA CONTINUAR\e[0m" && read enter
     ${SCPinst}/v2ray.sh
 }
 stats () {
-    echo -e "\e[1mEstadísticas de Consumo:\e[0m"
+    echo -e "\e[1mESTADÍSTICAS DE CONSUMO:\e[0m"
     v2ray stats
-    echo -e "\e[1mEnter Para Continuar\e[0m" && read enter
+    echo -e "\e[1mENTER PARA CONTINUAR\e[0m" && read enter
     ${SCPinst}/v2ray.sh
 }
 
@@ -1019,8 +1037,8 @@ stats () {
 show_speedtest_menu() {
     clear
     echo -e "\e[1;32m===== SpeedTest Menu =====\e[0m"
-    echo -e "1. \e[34mEjecutar speedtest \e[0m"
-    echo -e "2. \e[31mSalir al menú principal \e[0m"
+    echo -e "1. \e[34mEJECUTAR SPEEDTEST \e[0m"
+    echo -e "2. \e[31mSALIR AL MENÚ PRINCIPAL \e[0m"
     echo -e "\e[1;32m==========================\e[0m"
 }
 run_speedtest_menu() {
@@ -1029,15 +1047,15 @@ run_speedtest_menu() {
         read -p "Ingrese su elección: " choice_speedtest
         case $choice_speedtest in
             1)
-                echo -e "\e[1;33mEjecutando speedtest \e[0m"
+                echo -e "\e[1;33mEJECUTANDO SPEEDTEST \e[0m"
                 speedtest-cli --share
                 ;;
             2)
-                echo "Volviendo al menú principal."
+                echo "VOLVIENDO AL MENÚ PRINCIPAL."
                 break
                 ;;
             *)
-                echo "Opción inválida. Por favor, seleccione una opción válida."
+                echo "OPCIÓN INVÁLIDA. POR FAVOR, SELECCIONE UNA OPCIÓN VÁLIDA."
                 ;;
         esac
     done
@@ -1079,25 +1097,25 @@ while true; do
         10)
             while true; do
     clear
-    echo -e "${CYAN}===== configurar v2ray =====:${NC}"
+    echo -e "${CYAN}===== CONFIGURAR V2RAY =====${NC}"
     print_separator
-    echo -e "[1] ${GREEN}Instalar V2Ray ${NC}"
-    echo -e "[2] ${RED}Desinstalar V2Ray ${NC}"
+    echo -e "[1] ${GREEN}INSTALAR V2RAY ${NC}"
+    echo -e "[2] ${RED}DESINSTALAR V2RAY ${NC}"
 
     optimize_status="[${RED}off${NC}]"
     if crontab -l | grep -q "vm.drop_caches=3"; then
         optimize_status="[${GREEN}on${NC}]"
     fi
 
-    echo -e "[3] ${YELLOW} optimizar vps Aut. ${optimize_status} ${NC}"
-    echo -e "[4] ${GREEN}Cambiar el path de V2Ray ${NC}"
-    echo -e "[5] ${GREEN}Cambiar protocolo ${NC}"
-    echo -e "[6] ${GREEN}Activar TLS ${NC}"
-    echo -e "[7] ${GREEN}Cambiar puerto ${NC}"
-    echo -e "[8] ${GREEN}Cambiar IP ${NC}"
-    echo -e "[9] ${GREEN}Ver datos consumidos ${NC}"
-    echo -e "[10] ${GREEN} SpeedTest ${NC}"
-    echo -e "[11] ${YELLOW}Volver al menú principal ${NC}"
+    echo -e "[3] ${YELLOW} OPTIMIZAR VPS AUT. ${optimize_status} ${NC}"
+    echo -e "[4] ${GREEN}CAMBIAR EL PATH DE V2RAY ${NC}"
+    echo -e "[5] ${GREEN}CAMBIAR PROTOCOLO ${NC}"
+    echo -e "[6] ${GREEN}ACTIVAR TLS ${NC}"
+    echo -e "[7] ${GREEN}CAMBIAR PUERTO ${NC}"
+    echo -e "[8] ${GREEN}CAMBIAR IP ${NC}"
+    echo -e "[9] ${GREEN}VER DATOS CONSUMIDOS ${NC}"
+    echo -e "[10] ${GREEN}SPEEDTEST ${NC}"
+    echo -e "[11] ${YELLOW}VOLVER AL MENÚ PRINCIPAL ${NC}"
 print_separator
     read -r main_option
 
@@ -1157,8 +1175,8 @@ fi
         read -p "Ingrese su elección: " choice
         case $choice in
             1)
-                echo -e "\e[1;33mEjecutando speedtest\e[0m"
-                echo "Espere mientras se cargan los resultados:"
+                echo -e "\e[1;33mEJECUTANDO SPEEDTEST\e[0m"
+                echo "ESPERE MIENTRAS SE CARGAN LOS RESULTADOS:"
                 speedtest-cli --simple --share > speedtest_results.txt 2>/dev/null &
                 speedtest_pid=$!
 
@@ -1178,7 +1196,7 @@ fi
 
                 rm speedtest_results.txt
 
-                echo -e "\n\e[1;33mPresione Enter para volver al menú principal...\e[0m"
+                echo -e "\n\e[1;33mPRESIONE ENTER PARA VOLVER AL MENÚ PRINCIPAL...\e[0m"
                 read -s -r
                 ;;
             2)
@@ -1192,7 +1210,7 @@ fi
     done
     ;;
 11)
-                        echo "Volviendo al menú principal..."
+                        echo "Volviendo al menú principal."
                         break  
                         ;;
                     *)
