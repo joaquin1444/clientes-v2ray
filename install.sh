@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 echo -e "${YELLOW}╔═════════════════════════════════════════╗${NC}"
 echo -e "${YELLOW}║${NC}                                         ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}      ${YELLOW}BIENVENIDO AL SCRIPT${NC}               ${YELLOW}║${NC}"
