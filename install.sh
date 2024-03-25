@@ -1,38 +1,25 @@
 #!/bin/bash
 clear
 
-# Definir colores en formato RGB
-YELLOW='\033[38;2;255;255;0m'
-CYAN='\033[38;2;0;255;255m'
-NC='\033[0m' # No Color
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+CYAN=$(tput setaf 6)
+NC=$(tput sgr0) # No Color
+BG_BLACK=$(tput setab 0)
 
-# Calcular la longitud del separador para alinearlo
-separator_length=$((60 - 2))
-
-# Calcular la longitud de los espacios a cada lado del texto
-spaces_length=$((separator_length / 2 - 20)) # Se resta 20 porque 'Recomendado para Ubuntu 20.04' tiene una longitud de 20 caracteres
-
-# Crear los espacios a cada lado del texto
-left_spaces=""
-right_spaces=""
-for ((i = 0; i < spaces_length; i++)); do
-    left_spaces+=" "
-    right_spaces+=" "
-done
-
-# Imprimir el banner con colores y la frase recomendada
-echo -e "${YELLOW}╔═════════════════════════════════════════════════╗${NC}"
-echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           ${YELLOW}BIENVENIDO AL SCRIPT${NC}                  ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           ${YELLOW}MENU V2RAY VERSION 2.2${NC}                ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC} DESARROLLADO POR:                               ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                     JOAQUÍN                     ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           TELEGRAM: ${CYAN}T.ME/joaquinH2${NC}              ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC} ${CYAN}Recomendado para Ubuntu 20.04${NC}                   ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
-echo -e "${YELLOW}╚═════════════════════════════════════════════════╝${NC}"
+echo -e "${CYAN}${BG_BLACK}╔═════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}           ${CYAN}BIENVENIDO AL SCRIPT${NC}                  ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}           ${CYAN}MENU V2RAY VERSION 2.2${NC}                ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC} DESARROLLADO POR:                               ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}                     JOAQUÍN                     ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}           TELEGRAM: ${YELLOW}T.ME/joaquinH2${NC}              ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC} ${YELLOW}Recomendado para Ubuntu 20.04${NC}                   ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}╚═════════════════════════════════════════════════╝${NC}"
 
 sleep 1
 install_ini() {
@@ -149,5 +136,3 @@ if [ $? -eq 0 ]; then
 else
     echo "Error: No se pudo descargar el script v2.sh"
 fi
-
-# Eliminar el instalador
