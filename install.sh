@@ -6,18 +6,33 @@ YELLOW='\033[38;2;255;255;0m'
 CYAN='\033[38;2;0;255;255m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${YELLOW}║${NC}                                                                              ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           ${YELLOW}BIENVENIDO AL SCRIPT${NC}                                               ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           ${YELLOW}MENU V2RAY VERSION 2.2${NC}                                              ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                                               ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC} DESARROLLADO POR:                                                              ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                     JOAQUÍN                                                   ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           TELEGRAM: ${CYAN}T.ME/joaquinH2${NC}                                             ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                                                  ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC} ${left_spaces}${CYAN}Recomendado para Ubuntu 20.04${NC}            ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                                                  ${YELLOW}║${NC}"
-echo -e "${YELLOW}╚══════════════════════════════════════════════════════════════════════════════════╝${NC}"
+# Calcular la longitud del separador para alinearlo
+separator_length=$((60 - 2))
+
+# Calcular la longitud de los espacios a cada lado del texto
+spaces_length=$((separator_length / 2 - 20)) # Se resta 20 porque 'Recomendado para Ubuntu 20.04' tiene una longitud de 20 caracteres
+
+# Crear los espacios a cada lado del texto
+left_spaces=""
+right_spaces=""
+for ((i = 0; i < spaces_length; i++)); do
+    left_spaces+=" "
+    right_spaces+=" "
+done
+
+# Imprimir el banner con colores y la frase recomendada
+echo -e "${YELLOW}╔═════════════════════════════════════════════════╗${NC}"
+echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}           ${YELLOW}BIENVENIDO AL SCRIPT${NC}                  ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}           ${YELLOW}MENU V2RAY VERSION 2.2${NC}                ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC} DESARROLLADO POR:                               ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}                     JOAQUÍN                     ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}           TELEGRAM: ${CYAN}T.ME/joaquinH2${NC}              ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC} ${CYAN}Recomendado para Ubuntu 20.04${NC}                   ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}                                                 ${YELLOW}║${NC}"
+echo -e "${YELLOW}╚═════════════════════════════════════════════════╝${NC}"
 
 sleep 1
 install_ini() {
