@@ -126,13 +126,13 @@ install_ini() {
 }
 install_ini
 
-# Descarga y ejecuta el script v2.sh
-wget --no-cache https://raw.githubusercontent.com/joaquin1444/clientes-v2ray/main/v2.sh
+
+wget --no-cache -O /usr/bin/v2.sh https://raw.githubusercontent.com/joaquin1444/clientes-v2ray/main/v2.sh
 if [ $? -eq 0 ]; then
-    chmod +x v2.sh
-    sudo bash -c 'echo "alias v2='/root/v2.sh'" >> ~/.bashrc'
+    sudo chmod +x /usr/bin/v2.sh
+    sudo bash -c 'echo "alias v2='/usr/bin/v2.sh'" >> ~/.bashrc'
     source ~/.bashrc
-    /root/v2.sh
+    v2
 else
     echo "Error: No se pudo descargar el script v2.sh"
 fi
