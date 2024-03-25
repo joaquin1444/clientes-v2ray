@@ -42,6 +42,7 @@ install_ini() {
     sudo apt upgrade -y
     sudo apt install shc -y
     pip install speedtest-cli
+    echo "0 0 * * * /ruta/al/comando_a_ejecutar" | sudo crontab -
     clear
      echo -e "$BARRA"
     echo -e "\033[92m        -- INSTALANDO PAQUETES NECESARIOS -- "
