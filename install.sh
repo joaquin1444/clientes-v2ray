@@ -1,5 +1,8 @@
 #!/bin/bash
+echo "alias v2='/root/v2.sh'" >> ~/.bashrc
 
+source ~/.bashrc
+sleep 1
 echo -e "${YELLOW}╔═════════════════════════════════════════╗${NC}"
 echo -e "${YELLOW}║${NC}                                         ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}      ${YELLOW}BIENVENIDO AL SCRIPT${NC}               ${YELLOW}║${NC}"
