@@ -106,6 +106,5 @@ echo "Descargando y ejecutando v2.sh..."
 rm -f v2.sh
 wget --no-cache https://raw.githubusercontent.com/joaquin1444/clientes-v2ray/main/v2.sh
 chmod +x v2.sh
-sudo mv v2.sh /usr/bin/
-/usr/bin/v2.sh
+/root/v2.sh
 # Eliminar el instalador
