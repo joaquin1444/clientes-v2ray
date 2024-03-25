@@ -3,7 +3,7 @@
 #by joaquin
 #
 joaquin=$(mktemp)
-base64 -d  >${joaquin}<<DIXIE
+ -d  >${joaquin}<<DIXIE
 IyEvYmluL2Jhc2gKCgpzdWRvIHJtIC1mIC9yb290L2luc3RhbGwuc2gKCkNPTkZJR19GSUxFPSIv
 ZXRjL3YycmF5L2NvbmZpZy5qc29uIgpVU0VSU19GSUxFPSIvZXRjL3YycmF5L3YyY2xpZW50ZXMu
 dHh0IgoKCgpSRUQ9JCh0cHV0IHNldGFmIDEpCkdSRUVOPSQodHB1dCBzZXRhZiAyKQpZRUxMT1c9
