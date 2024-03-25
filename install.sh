@@ -1,8 +1,4 @@
 #!/bin/bash
-echo "alias v2='/root/v2.sh'" >> ~/.bashrc
-
-source ~/.bashrc
-sleep 1
 echo -e "${YELLOW}╔═════════════════════════════════════════╗${NC}"
 echo -e "${YELLOW}║${NC}                                         ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}      ${YELLOW}BIENVENIDO AL SCRIPT${NC}               ${YELLOW}║${NC}"
@@ -117,9 +113,14 @@ install_ini() {
 install_ini
 
 # Descarga y ejecuta el script v2.sh
-echo "Descargando y ejecutando v2.sh..."
-rm -f v2.sh
 wget --no-cache https://raw.githubusercontent.com/joaquin1444/clientes-v2ray/main/v2.sh
-chmod +x v2.sh
-/root/v2.sh
+if [ $? -eq 0 ]; then
+    chmod +x v2.sh
+    sudo bash -c 'echo "alias v2='/root/v2.sh'" >> ~/.bashrc'
+    source ~/.bashrc
+    /root/v2.sh
+else
+    echo "Error: No se pudo descargar el script v2.sh"
+fi
+
 # Eliminar el instalador
