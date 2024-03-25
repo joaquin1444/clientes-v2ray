@@ -2,8 +2,8 @@
 
 echo -e "${YELLOW}╔═════════════════════════════════════════╗${NC}"
 echo -e "${YELLOW}║${NC}                                         ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}      ${YELLOW}BIENVENIDO AL SCRIPT${NC}                ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}      ${YELLOW}MENU V2RAY VERSION 2.1${NC}              ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}      ${YELLOW}BIENVENIDO AL SCRIPT${NC}               ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}      ${YELLOW}MENU V2RAY VERSION 2.1${NC}             ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}                                         ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}DESARROLLADO POR:                        ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}                  JOAQUÍN                ${YELLOW}║${NC}"
