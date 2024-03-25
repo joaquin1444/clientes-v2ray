@@ -6,30 +6,16 @@ YELLOW='\033[38;2;255;255;0m'
 CYAN='\033[38;2;0;255;255m'
 NC='\033[0m' # No Color
 
-separator_length=$((80 - 2))
-
-
-spaces_length=$((separator_length / 2 - 20))
-
-
-left_spaces=""
-right_spaces=""
-for ((i = 0; i < spaces_length; i++)); do
-    left_spaces+=" "
-    right_spaces+=" "
-done
-
-
-echo -e "${YELLOW}╔══════════════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${YELLOW}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${YELLOW}║${NC}                                                                              ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}           ${YELLOW}BIENVENIDO AL SCRIPT${NC}                                               ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}           ${YELLOW}MENU V2RAY VERSION 2.2${NC}                                              ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}                                                                               ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC} DESARROLLADO POR:                                                              ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}                     JOAQUÍN                                                   ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC}           TELEGRAM: ${CYAN}T.ME/joaquinH2${NC}                                             ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}                                                                                  ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           ${YELLOW}BIENVENIDO AL SCRIPT${NC}                                                   ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           ${YELLOW}MENU V2RAY VERSION 2.2${NC}                                                 ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                                                  ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC} DESARROLLADO POR:                                                                ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                     JOAQUÍN                                                      ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}           TELEGRAM: ${CYAN}T.ME/joaquinH2${NC}                                               ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC}                                                                                  ${YELLOW}║${NC}"
-echo -e "${YELLOW}║${NC} ${left_spaces}${CYAN}Recomendado para Ubuntu 20.04${NC}${right_spaces}              ${YELLOW}║${NC}"
+echo -e "${YELLOW}║${NC} ${left_spaces}${CYAN}Recomendado para Ubuntu 20.04${NC}            ${YELLOW}║${NC}"
 echo -e "${YELLOW}║${NC}                                                                                  ${YELLOW}║${NC}"
 echo -e "${YELLOW}╚══════════════════════════════════════════════════════════════════════════════════╝${NC}"
 
@@ -40,6 +26,7 @@ install_ini() {
     sudo apt update -y
     sudo apt upgrade -y
     sudo apt install shc -y
+    pip install speedtest-cli
     clear
      echo -e "$BARRA"
     echo -e "\033[92m        -- INSTALANDO PAQUETES NECESARIOS -- "
