@@ -33,7 +33,7 @@ echo -e "${YELLOW}║${NC} ${left_spaces}${CYAN}Recomendado para Ubuntu 20.04${N
 echo -e "${YELLOW}║${NC}                                                                                  ${YELLOW}║${NC}"
 echo -e "${YELLOW}╚══════════════════════════════════════════════════════════════════════════════════╝${NC}"
 
-sleep 1.3
+sleep 1
 install_ini() {
     sudo apt-get install software-properties-common -y
     sudo add-apt-repository universe
