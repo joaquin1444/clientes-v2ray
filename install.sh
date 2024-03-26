@@ -15,7 +15,7 @@ echo -e "${CYAN}${BG_BLACK}║${NC}           ${CYAN}MENU V2RAY VERSION 2.2${NC}
 echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC} DESARROLLADO POR:                               ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC}                     JOAQUÍN                     ${CYAN}${BG_BLACK}║${NC}"
-echo -e "${CYAN}${BG_BLACK}║${NC}           TELEGRAM: ${YELLOW}T.ME/joaquinH2${NC}              ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}           TELEGRAM: ${YELLOW}t.me/joaquinH2${NC}              ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC} ${YELLOW}Recomendado para Ubuntu 20.04${NC}                   ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
