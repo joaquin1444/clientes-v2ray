@@ -11,7 +11,7 @@ BG_BLACK=$(tput setab 0)
 echo -e "${CYAN}${BG_BLACK}╔═════════════════════════════════════════════════╗${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC}           ${CYAN}BIENVENIDO AL SCRIPT${NC}                  ${CYAN}${BG_BLACK}║${NC}"
-echo -e "${CYAN}${BG_BLACK}║${NC}           ${CYAN}MENU V2RAY VERSION 2.2${NC}                ${CYAN}${BG_BLACK}║${NC}"
+echo -e "${CYAN}${BG_BLACK}║${NC}           ${CYAN}MENU V2RAY VERSION 2.3${NC}                ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC}                                                 ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC} DESARROLLADO POR:                               ${CYAN}${BG_BLACK}║${NC}"
 echo -e "${CYAN}${BG_BLACK}║${NC}                     JOAQUÍN                     ${CYAN}${BG_BLACK}║${NC}"
