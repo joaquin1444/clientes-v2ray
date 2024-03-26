@@ -127,20 +127,20 @@ install_ini() {
 install_ini
 
 
+
 if [ -f /usr/bin/v2.sh ]; then
     sudo rm /usr/bin/v2.sh
 fi
 
+unalias v2 > /dev/null 2>&1
 
-wget --no-cache -O /usr/bin/v2.sh https://raw.githubusercontent.com/joaquin1444/clientes-v2ray/main/v2.sh
+wget --no-cache -O /usr/bin/v2.sh https://raw.githubusercontent.com/joaquin1444/clientes-v2ray/main/v2.sh > /dev/null 2>&1
 if [ $? -eq 0 ]; then
     sudo chmod +x /usr/bin/v2.sh
     
-    # Agregar el alias v2 al final del archivo .bashrc
-    echo "alias v2='/usr/bin/v2.sh'" | sudo tee -a ~/.bashrc
+    echo "alias v2='/usr/bin/v2.sh'" | sudo tee -a ~/.bashrc > /dev/null
     
-    # Ejecutar el script v2.sh
-    v2
+    /usr/bin/v2.sh
 else
     echo "Error: No se pudo descargar el script v2.sh"
 fi
