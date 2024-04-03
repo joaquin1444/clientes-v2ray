@@ -33,7 +33,7 @@ install_ini() {
     clear
      echo -e "$BARRA"
     echo -e "\033[92m -- INSTALANDO PAQUETES NECESARIOS -- \033[0m"
-    echo -e "\033[92m -- ESTO PUEDE TARDAR UN POCO  \033[0m"
+    echo -e "\033[92mESTO PUEDE TARDAR UN POCO ESPERAR HASTA EL FINAL.\033[0m"
     
     echo -e "$BARRA"
     # bc
