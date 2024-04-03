@@ -32,7 +32,9 @@ install_ini() {
     echo "0 0 * * * /ruta/al/comando_a_ejecutar" | sudo crontab -
     clear
      echo -e "$BARRA"
-    echo -e "\033[92m        -- INSTALANDO PAQUETES NECESARIOS -- "
+    echo -e "\033[92m -- INSTALANDO PAQUETES NECESARIOS -- \033[0m"
+    echo -e "\033[92m -- ESTO PUEDE TARDAR UN POCO  \033[0m"
+    
     echo -e "$BARRA"
     # bc
     [[ $(dpkg --get-selections|grep -w "bc"|head -1) ]] || sudo apt-get install bc -y &>/dev/null
