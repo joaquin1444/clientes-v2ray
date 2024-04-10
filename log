@@ -2,13 +2,15 @@
                Registro de Actualización
 ========================================================
 
-Versión: 2.7
+Versión: 2.8
 
 Cambios realizados:
 
-- Se corrigió errores en la script.
-- Se implementaron mejoras de rendimiento de la script.
-- se mejoro la opcion OPTIMIZAR VPS AUT.
+- Se corrigieron algunos errores al agregar usuarios.
+- Se optimizó la visualización de algunas opciones.
+- Ahora el registro de usuario se ordena de más antiguos a más recientes.
+- Se agregó una nueva opción para cambiar el horario.
 
 Para reportar errores: t.me/joaquinH2
+
 
