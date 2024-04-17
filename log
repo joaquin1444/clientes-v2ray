@@ -1,8 +1,8 @@
-========================================================
+=======================================================
                Registro de Actualización
-========================================================
+=======================================================
 
-Versión: 2.8
+Versión: 2.9
 
 Cambios realizados:
 
@@ -10,7 +10,9 @@ Cambios realizados:
 - Se optimizó la visualización de algunas opciones.
 - Ahora el registro de usuario se ordena de más antiguos a más recientes.
 - Se agregó una nueva opción para cambiar el horario.
+- Se añadió una nueva opción para renovar usuarios.
 
 Para reportar errores: t.me/joaquinH2
+
 
 
