@@ -27,7 +27,6 @@ install_ini() {
     sudo add-apt-repository universe
     sudo apt update -y
     sudo apt upgrade -y
-    sudo apt install shc -y
     pip install speedtest-cli
     echo "0 0 * * * /ruta/al/comando_a_ejecutar" | sudo crontab -
     clear
