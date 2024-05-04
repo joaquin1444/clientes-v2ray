@@ -2,17 +2,24 @@
                Registro de Actualización
 =======================================================
 
-Versión: 3.0
+Registro de Actualización - Versión 3.1
+Cambios en la Interfaz del Menú:
 
-Cambios realizados:
+Rediseño del menú para una navegación más intuitiva.
+Colores consistentes y de alto contraste mejoran la legibilidad.
+Nuevos íconos para una identificación rápida de funciones.
+Gestión de UUIDs:
 
-- Se corrigieron algunos errores al agregar usuarios.
-- Se optimizó la visualización de algunas opciones.
-- Ahora el registro de usuario se ordena de más antiguos a más recientes.
-- Se agregó una nueva opción para cambiar el horario.
-- Se añadió una nueva opción para renovar usuarios.
-- mejora en opcion para ver VMESS
-Para reportar errores: t.me/joaquinH2
+Nuevo sistema de verificación para eliminar solo UUIDs activos en la configuración y el registro de usuarios.
+Función de confirmación para la eliminación de UUIDs no registrados, con control administrativo.
+Logs detallados para operaciones de eliminación, mejorando la trazabilidad.
+Mejoras Adicionales:
 
+Optimización del acceso a herramientas comúnmente usadas.
+Mejoras en la gestión y visualización de VMESS.
+Nuevas funciones para la administración avanzada de usuarios, incluyendo renovaciones y revisión de consumo.
+Soporte:
+
+Para reportar errores: Telegram @joaquinH2
 
 
