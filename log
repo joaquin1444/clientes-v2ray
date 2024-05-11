@@ -2,23 +2,12 @@
                Registro de Actualización
 =======================================================
 
-Registro de Actualización - Versión 3.1
-Cambios en la Interfaz del Menú:
+Registro de Actualización - Versión 3.2
 
-Rediseño del menú para una navegación más intuitiva.
-Colores consistentes y de alto contraste mejoran la legibilidad.
-Nuevos íconos para una identificación rápida de funciones.
-Gestión de UUIDs:
-
-Nuevo sistema de verificación para eliminar solo UUIDs activos en la configuración y el registro de usuarios.
-Función de confirmación para la eliminación de UUIDs no registrados, con control administrativo.
-Logs detallados para operaciones de eliminación, mejorando la trazabilidad.
-Mejoras Adicionales:
-
-Optimización del acceso a herramientas comúnmente usadas.
+Optimización de script mejorada.
 Mejoras en la gestión y visualización de VMESS.
+solucion de errores al renovar y eliminar ecpirados 
 Soporte:
-
 Para reportar errores: Telegram @joaquinH2
 
 
