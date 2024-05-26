@@ -8,6 +8,7 @@ Optimización de script mejorada.
 Mejoras en la gestión y visualización de VMESS.
 Solución de errores al renovar y eliminar usuarios expirados.
 Se agregó soporte para el horario al agregar, renovar, eliminar y otras funciones relacionadas con la gestión de usuarios.
+el vmess lo genera por defecto con puerto 80
 Soporte:
 Para reportar errores: Telegram https://t.me/joaquinH2
 
