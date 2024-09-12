@@ -1,5 +1,9 @@
 -------------------------------------------------------
                Registro de Actualización
+- Registro de Actualización - Versión 3.9
+- Mejoras en la opción 2 para eliminar usuarios: ahora se elimina correctamente por UUID o número de índice en la lista.
+P.D.: Kevin se la come.
+
 -------------------------------------------------------
 
 - Registro de Actualización - Versión 3.8
