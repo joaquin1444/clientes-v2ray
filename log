@@ -1,14 +1,12 @@
-echo -e "-------------------------------------------------------"
-echo -e "              ${CYAN}Registro de Actualización${NC}               "
-echo -e "-------------------------------------------------------"
-echo -e "   ${YELLOW}Versión 4.0${NC}"
-echo -e ""
-echo -e "   - Se agregó la opción de ${GREEN}V2Ray nativo${NC} al menú de inicio,"
-echo -e "     facilitando su instalación en caso de no estar instalado."
-echo -e "   - Se realizaron algunos ajustes necesarios para"
-echo -e "     mejorar el rendimiento y la estabilidad del script."
-echo -e "-------------------------------------------------------"
 
+
+-------------------------------------------------------
+                 Notas de Actualización                
+-------------------------------------------------------
+   - Se agregó la opción de V2Ray nativo al menú de inicio.
+   - Mejora en la instalación en caso de que V2Ray no esté instalado.
+   - Ajustes realizados para mejorar el rendimiento y la estabilidad.
+-------------------------------------------------------
 
 
 
