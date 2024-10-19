@@ -1,22 +1,14 @@
--------------------------------------------------------
-               Registro de Actualización
-- Registro de Actualización - Versión 3.9
-- Mejoras en la opción 2 para eliminar usuarios: ahora se elimina correctamente por UUID o número de índice en la lista.
-P.D.: Kevin se la come.
+echo -e "-------------------------------------------------------"
+echo -e "              ${CYAN}Registro de Actualización${NC}               "
+echo -e "-------------------------------------------------------"
+echo -e "   ${YELLOW}Versión 4.0${NC}"
+echo -e ""
+echo -e "   - Se agregó la opción de ${GREEN}V2Ray nativo${NC} al menú de inicio,"
+echo -e "     facilitando su instalación en caso de no estar instalado."
+echo -e "   - Se realizaron algunos ajustes necesarios para"
+echo -e "     mejorar el rendimiento y la estabilidad del script."
+echo -e "-------------------------------------------------------"
 
--------------------------------------------------------
-
-- Registro de Actualización - Versión 3.8
-
-- Optimización de script mejorada.
-- Mejoras en la gestión y visualización de VMESS.
-- Solución de errores al renovar y eliminar usuarios expirados.
-- Se agregó soporte para el horario al agregar, renovar, eliminar y otras funciones relacionadas con la gestión de usuarios.
-- El VMESS ahora se genera con puerto 80 y el puerto configurado al crear un usuario.
-- Se corrigió el error de renovar usuarios expirados.
-- Los backups ahora se generan en un archivo RAR y se dejan en /root.
-- Para restaurar los backups, se sigue siendo compatible con el formato anterior y el nuevo.
-- Se cambiaron algunas cosas de la script para mejorar el aspecto y la optimización.
 
 
 
